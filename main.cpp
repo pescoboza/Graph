@@ -5,12 +5,26 @@
 int main() {
 	Graph<int> graph;
 
-	graph.addNodeCpy(6, { 5 }, {7,8})
-		.addNodeCpy(5, { 6, 4, 1, 2 }, {7,10});
+	graph.addNodeCpy(1, {0}, {2,3})
+		.addNodeCpy(3, {}, {1});
 
-	graph.depthFirstSearch(6, [](const int& value) {std::cout << value << " -> "; });
-	std::cout << '\n';
 
+	auto printValue{ 
+		[](const int& v) {
+			std::cout << v << " -> ";
+		} 
+	};
+
+	std::cout << "=== ADJ LIST ===\n\n";
 	graph.print();
+
+	std::cout << "\n\n=== DFS ===\n\n";
+	graph.depthFirstSearch(0, printValue);
+	
+	std::cout << "\n\n=== BFS ===\n\n";
+	graph.breathFirstSearch(0, printValue);
+	
+	
+	
 	return 0;
 }

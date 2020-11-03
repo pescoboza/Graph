@@ -2,40 +2,61 @@
 #define GRAPH_HPP
 
 #include <iostream>
+#include <queue>
 #include <unordered_set>
 #include <unordered_map>
 #include <vector>
 
 template <typename T>
 class Graph{
-	using Children = std::unordered_set<const T*>;
-	std::unordered_map<T, Children> m_table;
+	using ChildrenPtrs = std::unordered_set<const T*>;
+	std::unordered_map<T, ChildrenPtrs> m_table;
 
 public:
 	Graph();
+
+	// Add a node given the value, its parents and children. It register all the
+	// new nodes in the adjacency list.
+	// Time complexity: O(n)
+	// Space complexity: O(1)
 	Graph& addNodeRef(const T& value, const std::vector<T>& parents, const std::vector<T>& children);
+	
+	// Add a node given the value, its parents and children. It register all the
+	// new nodes in the adjacency list.
+	// Useful for passing intiliazer lists.
+	// Time complexity: O(n)
+	// Space complexity: O(n)
 	Graph& addNodeCpy(const T& value, std::vector<T> parents, std::vector<T> children);
+	
+	// Executes visit function on each node value with a breath first search.
+	// Time complexity: O(n)
+	// Space complexity: O(n)
 	template <class UnaryFunction>
-	Graph& breathFirstSearch(const T& head, UnaryFunction f);
+	Graph& breathFirstSearch(const T& head, UnaryFunction visit);
+	
+	// Executes visit function on each node value with a depth first search.
+	// Time complexity: O(n)
+	// Space complexity: O(n)
 	template <class UnaryFunction>
-	Graph& depthFirstSearch(const T& head, UnaryFunction f);
+	Graph& depthFirstSearch(const T& head, UnaryFunction visit);
 
-
-	void print(std::ostream& out = std::cout)const {
-		for (const auto& nodePair : m_table) {
-			out << nodePair.first << " { ";
-			for (const auto& childPtr : nodePair.second) {
-				out << *childPtr << " ";
-			}
-			out << " }\n";
-		}
-	}
+	// Prints the adjacency list in the given ostream.
+	// Time complexity: O(n)
+	// Space complexity: O(n)
+	void print(std::ostream& out = std::cout) const;
 
 private:
+	// Helper for breadth first search.
+	// Time complexity: O(n)
+	// Space complexity: O(1)
 	template <class UnaryFunction>
-	void bfs(const T& value, UnaryFunction f, Children& visited);
+	void bfs(const T& value, UnaryFunction visit);
+	
+	// Helper for depth first search.
+	// Time complexity: O(n)
+	// Space complexity: O(1)
 	template <class UnaryFunction>
-	void dfs(const T& value, UnaryFunction f, Children& visited);
+	void dfs(const T& value, UnaryFunction visit, ChildrenPtrs& visited);
 };
 
 
@@ -46,18 +67,18 @@ template<typename T>
 inline Graph<T>& Graph<T>::addNodeRef(const T& value, const std::vector<T>& parents, const std::vector<T>& children){
 	
 	// Emplace given node (map returns a pair<iterator,bool> of inserted or already present element)
-	auto empPair{ m_table.emplace(value, Children{}) };
+	auto empPair{ m_table.emplace(value, ChildrenPtrs{}) };
 	
 	// Readability aliases
 	const T& insertedNodeOwner{empPair.first->first};
-	Children& insertedNodeChildren{ empPair.first->second };
+	ChildrenPtrs& insertedNodeChildren{ empPair.first->second };
 
 	
 	// Insert children
 	for (auto& child : children) {
 		
 		// Register node in hash table, does nothing if already present
-		const T& childOwner{ m_table.emplace(child, Children{}).first->first };
+		const T& childOwner{ m_table.emplace(child, ChildrenPtrs{}).first->first };
 
 		// Add the child to the parent, does nothing if already present
 		insertedNodeChildren.emplace(&childOwner);
@@ -66,7 +87,7 @@ inline Graph<T>& Graph<T>::addNodeRef(const T& value, const std::vector<T>& pare
 	for (auto& parent : parents) {
 
 		// Register parent node, does nothing if already present
-		auto& parentNodeChildren{ m_table.emplace(parent, Children{}).first->second};
+		auto& parentNodeChildren{ m_table.emplace(parent, ChildrenPtrs{}).first->second};
 
 		// Add the main node to the parents, if not already present
 		parentNodeChildren.emplace(&insertedNodeOwner);
@@ -80,19 +101,73 @@ inline Graph<T>& Graph<T>::addNodeCpy(const T& value, std::vector<T> parents, st
 	return addNodeRef(value, parents, children);
 }
 
-#endif // !GRAPH_HPP
+template<typename T>
+inline void Graph<T>::print(std::ostream& out) const{
+	for (const auto& nodePair : m_table) {
+		out << nodePair.first << " { ";
+		for (const auto& childPtr : nodePair.second) {
+			out << *childPtr << " ";
+		}
+		out << " }\n";
+	}
+}
+
 
 template<typename T>
 template<class UnaryFunction>
-inline Graph<T>& Graph<T>::depthFirstSearch(const T& head, UnaryFunction f){
-	Children visited;
-	dfs(head, f, visited);
+inline Graph<T>& Graph<T>::breathFirstSearch(const T& head, UnaryFunction visit){
+	bfs(head, visit);
 	return *this;
 }
 
 template<typename T>
 template<class UnaryFunction>
-inline void Graph<T>::dfs(const T& value, UnaryFunction f, Children& visited){
+inline Graph<T>& Graph<T>::depthFirstSearch(const T& head, UnaryFunction visit){
+	ChildrenPtrs visited;
+	dfs(head, visit, visited);
+	return *this;
+}
+
+template<typename T>
+template<class UnaryFunction>
+inline void Graph<T>::bfs(const T& value, UnaryFunction visit){
+	
+	// Look for element in node table
+	auto it{m_table.find(value)};
+	if (it == m_table.end()) 
+		return;
+	
+	// Create queue to store all children
+	std::queue<const T*> queue;
+	queue.emplace(&it->first);
+	
+	// Create set to store all visited nodes
+	ChildrenPtrs visited{&it->first};
+
+	// Enqueue the children and their own children until all nodes are visited
+	while (!queue.empty()) {
+		
+		// Get first element in queue
+		const T& cref{*queue.front()};
+		queue.pop();
+		
+		// Visit the node
+		visit(cref);
+
+		// Enque the node's children
+		for (const auto& childPtr : m_table.at(cref)) {
+
+			// Attempt marking node as visited
+			if (visited.emplace().second)
+				queue.emplace(childPtr); // If so, node was not  marked: enqueue the node
+		}
+	}
+	
+}
+
+template<typename T>
+template<class UnaryFunction>
+inline void Graph<T>::dfs(const T& value, UnaryFunction visit, ChildrenPtrs& visited){
 	// Look for value in node list
 	auto it{m_table.find(value)};
 	if (it == m_table.end())
@@ -101,7 +176,7 @@ inline void Graph<T>::dfs(const T& value, UnaryFunction f, Children& visited){
 	{
 		// Visit the node
 		const T& cref{ it->first };
-		f(cref);
+		visit(cref);
 	}
 	
 	// Remember node as visited
@@ -112,6 +187,8 @@ inline void Graph<T>::dfs(const T& value, UnaryFunction f, Children& visited){
 		
 		// If new node is inserted, it must be visited
 		if (visited.emplace(childPtr).second)
-			dfs(*childPtr, f, visited); // Pass olympic torch
+			dfs(*childPtr, visit, visited); // Pass olympic torch
 	}
 }
+
+#endif // !GRAPH_HPP
