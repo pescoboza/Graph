@@ -8,22 +8,23 @@
 
 template <typename T>
 class Graph{
-	
-	std::unordered_map<T, std::unordered_set<T*>> m_table;
+	using Children = std::unordered_set<const T*>;
+	std::unordered_map<T, Children> m_table;
 
 public:
 	Graph();
-	Graph& addNode(const T& value, std::vector<T>& parents, std::vector<T>& children);
+	Graph& addNodeRef(const T& value, const std::vector<T>& parents, const std::vector<T>& children);
+	Graph& addNodeCpy(const T& value, std::vector<T> parents, std::vector<T> children);
 	template <class UnaryFunction>
 	Graph& breathFirstSearch(const T& head, UnaryFunction f) const;
 	template <class UnaryFunction>
 	Graph& depthFirstSearch(const T& head, UnaryFunction f) const;
 
-	void changoPrint(std::ostream& out = std::cout)const {
+	void print(std::ostream& out = std::cout)const {
 		for (const auto& nodePair : m_table) {
 			out << nodePair.first << " { ";
 			for (const auto& childPtr : nodePair.second) {
-				out << *childPtr << ", ";
+				out << *childPtr << " ";
 			}
 			out << " }\n";
 		}
@@ -34,35 +35,44 @@ public:
 
 
 template<typename T>
-inline Graph<T>& Graph<T>::addNode(const T& value, std::vector<T>& parents, std::vector<T>& children){
+inline Graph<T>::Graph() :m_table{} {}
+
+template<typename T>
+inline Graph<T>& Graph<T>::addNodeRef(const T& value, const std::vector<T>& parents, const std::vector<T>& children){
 	
 	// Emplace given node (map returns a pair<iterator,bool> of inserted or already present element)
-	auto empPair{ m_table.emplace(value, {}) };
+	auto empPair{ m_table.emplace(value, Children{}) };
 	
 	// Readability aliases
-	auto& insertedNodeOwner{empPair.first->first};
-	auto& insertedNodeChildren{ empPair.first->second };
+	const T& insertedNodeOwner{empPair.first->first};
+	Children& insertedNodeChildren{ empPair.first->second };
+
 	
 	// Insert children
 	for (auto& child : children) {
 		
 		// Register node in hash table, does nothing if already present
-		m_table.emplace(child, {});
+		const T& childOwner{ m_table.emplace(child, Children{}).first->first };
 
 		// Add the child to the parent, does nothing if already present
-		insertedNodeChildren.emplace(&insertedNodeOwner);
+		insertedNodeChildren.emplace(&childOwner);
 	}
 
 	for (auto& parent : parents) {
 
 		// Register parent node, does nothing if already present
-		auto& parentNodeChildren{ m_table.emplace(parent, {}).first->second};
+		auto& parentNodeChildren{ m_table.emplace(parent, Children{}).first->second};
 
 		// Add the main node to the parents, if not already present
 		parentNodeChildren.emplace(&insertedNodeOwner);
 	}
 
+	return *this;
+}
 
+template<typename T>
+inline Graph<T>& Graph<T>::addNodeCpy(const T& value, std::vector<T> parents, std::vector<T> children){
+	return addNodeRef(value, parents, children);
 }
 
 #endif // !GRAPH_HPP

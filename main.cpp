@@ -4,9 +4,10 @@
 
 int main() {
 	Graph<int> graph;
-	std::vector<int> parents{};
-	std::vector<int> children{7,8};
 
-	graph.addNode(6, parents, children);
+	graph.addNodeCpy(6, { 5 }, {7,8})
+		.addNodeCpy(5, { 6, 4, 1, 2 }, {7,10});
+
+	graph.print();
 	return 0;
 }
