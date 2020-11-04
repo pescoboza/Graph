@@ -56,14 +56,14 @@ void test3() {
 	std::vector<std::vector<bool>> adjMat{
 		// 0  1  2  3  4
 		{  0, 1, 0, 0, 0}, // 0
-		{  0, 0, 0, 1, 0}, // 1
-		{  0, 1, 0, 1, 1}, // 2
-		{  0, 1, 0, 0, 0}, // 3
-		{  1, 0, 1, 0, 0}  // 4
+		{  1, 0, 0, 1, 0}, // 1
+		{  1, 1, 0, 1, 1}, // 2
+		{  1, 1, 1, 0, 0}, // 3
+		{  1, 1, 1, 0, 0}  // 4
 	};
 
 	GraphUint graph{adjMat};
-	auto root{ 0U };
+	auto root{ 2U };
 
 	std::cout << "=== Adjacency List ===\n\n";
 	graph.printAdjList();

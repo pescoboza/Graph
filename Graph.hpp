@@ -16,6 +16,12 @@ protected:
 
 public:
 	Graph();
+	Graph(const std::vector<std::pair<T, std::vector<T>>>& adjList);
+
+	// Loads graph from adjacency list, overwriting all previous data.
+	// Time complexity: O(n^2)
+	// Space complexity: O(1)
+	void loadGraph(const std::vector<std::pair<T, std::vector<T>>>& adjList);
 
 	// Add a node given the value, its parents and children. It register all the
 	// new nodes in the adjacency list.
@@ -75,11 +81,7 @@ protected:
 class GraphUint : public Graph<unsigned> {
 public:
 	GraphUint();
-
-	// Constructs graph from adjacency matrix, overwriting all previous data.
-	// Unlinked nodes do not get inserted.
-	// Time complexity: O(n^2)
-	// Space complexity: O(1)
+	GraphUint(const std::vector<std::pair<unsigned, std::vector<unsigned>>>& adjList);
 	GraphUint(const std::vector<std::vector<bool>>& adjMat);
 
 	// Loads graph from adjacency matrix, overwriting all previous data.
@@ -90,7 +92,20 @@ public:
 };
 
 template<typename T>
-inline Graph<T>::Graph() :m_table{} {}
+inline Graph<T>::Graph() : m_table{} {}
+
+template<typename T>
+inline Graph<T>::Graph(const std::vector<std::pair<T, std::vector<T>>>& adjList) : Graph{}  {
+	loadGraph(adjList);
+}
+
+template<typename T>
+inline void Graph<T>::loadGraph(const std::vector<std::pair<T, std::vector<T>>>& adjList){
+	m_table.clear();
+	std::vector<T> empty;
+	for (const auto& node : adjList)
+		addNodeRef(node.first, empty, node.second);
+}
 
 template<typename T>
 inline Graph<T>& Graph<T>::addNodeRef(const T& value, const std::vector<T>& parents, const std::vector<T>& children){
