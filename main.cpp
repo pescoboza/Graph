@@ -113,22 +113,25 @@ void test5() {
 	const unsigned NUM_NODES{ 1000 };
 	const unsigned MAX_NUM_CHILDREN{ 10 };
 	
-	
-	std::vector<std::pair<unsigned, std::vector<unsigned>>> adjList;
-	adjList.reserve(NUM_NODES);
-	for (unsigned i{ 0U }; i < NUM_NODES; ++i) {
-		
-		adjList.emplace_back(i, std::vector<unsigned>{});
-		auto& children{adjList.back().second};
-		
-		unsigned numChildren{ std::rand() % MAX_NUM_CHILDREN };
-		for (unsigned chNum{ 0U }; chNum < numChildren; ++chNum)
-			children.emplace_back(std::rand() % NUM_NODES);
-
-	}
-
-	GraphUint graph{ adjList };
+	Graph<unsigned> graph;
 	auto root{ 0U };
+	{
+		std::vector<std::pair<unsigned, std::vector<unsigned>>> adjList;
+		adjList.reserve(NUM_NODES);
+		for (unsigned i{ 0U }; i < NUM_NODES; ++i) {
+
+			adjList.emplace_back(i, std::vector<unsigned>{});
+			auto& children{ adjList.back().second };
+
+			unsigned numChildren{ std::rand() % MAX_NUM_CHILDREN };
+			for (unsigned chNum{ 0U }; chNum < numChildren; ++chNum)
+				children.emplace_back(std::rand() % NUM_NODES);
+
+		}
+
+		graph.loadGraph(adjList);
+	}
+	
 
 	std::cout << "=== Adjacency List ===\n\n";
 	graph.printAdjList();
@@ -149,22 +152,25 @@ void test6() {
 	const unsigned NUM_NODES{ 10000 };
 	const unsigned MAX_NUM_CHILDREN{ 100 };
 
-
-	std::vector<std::pair<unsigned, std::vector<unsigned>>> adjList;
-	adjList.reserve(NUM_NODES);
-	for (unsigned i{ 0U }; i < NUM_NODES; ++i) {
-
-		adjList.emplace_back(i, std::vector<unsigned>{});
-		auto& children{ adjList.back().second };
-
-		unsigned numChildren{ std::rand() % MAX_NUM_CHILDREN };
-		for (unsigned chNum{ 0U }; chNum < numChildren; ++chNum)
-			children.emplace_back(std::rand() % NUM_NODES);
-
-	}
-
-	GraphUint graph{ adjList };
+	Graph<unsigned> graph;
 	auto root{ 0U };
+
+	{
+		std::vector<std::pair<unsigned, std::vector<unsigned>>> adjList;
+		adjList.reserve(NUM_NODES);
+		for (unsigned i{ 0U }; i < NUM_NODES; ++i) {
+
+			adjList.emplace_back(i, std::vector<unsigned>{});
+			auto& children{ adjList.back().second };
+
+			unsigned numChildren{ std::rand() % MAX_NUM_CHILDREN };
+			for (unsigned chNum{ 0U }; chNum < numChildren; ++chNum)
+				children.emplace_back(std::rand() % NUM_NODES);
+
+		}
+
+		graph.loadGraph(adjList);
+	}
 
 	std::cout << "=== Adjacency List ===\n\n";
 	graph.printAdjList();
