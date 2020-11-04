@@ -173,7 +173,7 @@ void test6() {
 	}
 
 	std::cout << "=== Adjacency List ===\n\n";
-	graph.printAdjList();
+	//graph.printAdjList();
 
 	std::cout << "\n\n=== DFS ===\n\n";
 	graph.DFS(root);
