@@ -10,6 +10,8 @@
 template <typename T>
 class Graph{
 	using ChildrenPtrs = std::unordered_set<const T*>;
+
+protected:
 	std::unordered_map<T, ChildrenPtrs> m_table;
 
 public:
@@ -45,7 +47,7 @@ public:
 	// Space complexity: O(n)
 	void print(std::ostream& out = std::cout) const;
 
-private:
+protected:
 	// Helper for breadth first search.
 	// Time complexity: O(n)
 	// Space complexity: O(1)
@@ -59,6 +61,23 @@ private:
 	void dfs(const T& value, UnaryFunction visit, ChildrenPtrs& visited);
 };
 
+
+class GraphUint : Graph<unsigned> {
+public:
+	GraphUint();
+
+	// Constructs graph from adjacency matrix, overwriting all previous data.
+	// Unlinked nodes do not get inserted.
+	// Time complexity: O(n^2)
+	// Space complexity: O(1)
+	GraphUint(const std::vector<std::vector<bool>>& adjMat);
+
+	// Loads graph from adjacency matrix, overwriting all previous data.
+	// Unlinked nodes do not get inserted.
+	// Time complexity: O(n^2)
+	// Space complexity: O(1)
+	void loadGraph(const std::vector<std::vector<bool>>& adjMat);
+};
 
 template<typename T>
 inline Graph<T>::Graph() :m_table{} {}
