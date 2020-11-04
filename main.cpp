@@ -1,3 +1,8 @@
+// Pedro Escboza
+// A01251531
+// 03/11/2020
+// TC1031.501
+
 #include "Graph.hpp"
 
 #include <string>
