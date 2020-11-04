@@ -45,7 +45,17 @@ public:
 	// Prints the adjacency list in the given ostream.
 	// Time complexity: O(n)
 	// Space complexity: O(n)
-	void print(std::ostream& out = std::cout) const;
+	void printAdjList(std::ostream& out = std::cout) const;
+
+	// Traverses nodes by depth first search and print the values in order.
+	// Time complexity: O(n)
+	// Space complexity: O(n)
+	Graph& DFS(const T& head, std::ostream& out = std::cout);
+
+	// Traverses nodes by breath first search and print the values in order.
+	// Time complexity: O(n)
+	// Space complexity: O(n)
+	Graph& BFS(const T& head, std::ostream& out = std::cout);
 
 protected:
 	// Helper for breadth first search.
@@ -121,7 +131,7 @@ inline Graph<T>& Graph<T>::addNodeCpy(const T& value, std::vector<T> parents, st
 }
 
 template<typename T>
-inline void Graph<T>::print(std::ostream& out) const{
+inline void Graph<T>::printAdjList(std::ostream& out) const{
 	for (const auto& nodePair : m_table) {
 		out << nodePair.first << " { ";
 		for (const auto& childPtr : nodePair.second) {
@@ -129,6 +139,19 @@ inline void Graph<T>::print(std::ostream& out) const{
 		}
 		out << " }\n";
 	}
+}
+
+template<typename T>
+inline Graph<T>& Graph<T>::DFS(const T& head, std::ostream& out){
+	ChildrenPtrs visited;
+	dfs(head, [&out](const T& v) {out << v << " -> "; }, visited);
+	return *this;
+}
+
+template<typename T>
+inline Graph<T>& Graph<T>::BFS(const T& head, std::ostream& out){
+	bfs(head, [&out](const T& v) {out << v << " -> "; });
+	return *this;
 }
 
 

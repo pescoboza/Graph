@@ -5,52 +5,43 @@
 
 
 void test1() {
-	auto printValue{ 
-		[](const int& v){
-			std::cout << v << " -> ";
-		}
-	};
-	
 	Graph<int> graph;
 
 	//              node,	parents, children
 	graph.addNodeCpy(1,		{0},	 {2,3})
 		 .addNodeCpy(3,		{},		 {1});
 
+	auto root{ 0 };
 
 	std::cout << "=== Adjacency List ===\n\n";
-	graph.print();
+	graph.printAdjList();
 
 	std::cout << "\n\n=== DFS ===\n\n";
-	graph.depthFirstSearch(0, printValue);
+	graph.DFS(root);
 	
 	std::cout << "\n\n=== BFS ===\n\n";
-	graph.breathFirstSearch(0, printValue);
+	graph.BFS(root);
 		
 	std::cout << "\n\n";
 }
 
 void test2() {
-	auto printValue{ 
-		[](const std::string& v) {
-			std::cout << v << " -> ";
-		}
-	};
-
 
 	Graph<std::string> graph;
 
 	graph.addNodeCpy("hello", { "I", "live" }, { "here" })
  		.addNodeCpy("I", { "hello" }, { "here" });
 
+	auto root{ "hello" };
+
 	std::cout << "=== Adjacency List ===\n\n";
-	graph.print();
+	graph.printAdjList();
 
 	std::cout << "\n\n=== DFS ===\n\n";
-	graph.depthFirstSearch("hello", printValue);
+	graph.DFS(root);
 
 	std::cout << "\n\n=== BFS ===\n\n";
-	graph.breathFirstSearch("hello", printValue);
+	graph.BFS(root);
 
 	std::cout << "\n\n";
 }
@@ -72,17 +63,22 @@ void test3() {
 	};
 
 	GraphUint graph{adjMat};
+	auto root{ 0U };
 
 	std::cout << "=== Adjacency List ===\n\n";
-	graph.print();
+	graph.printAdjList();
 
 	std::cout << "\n\n=== DFS ===\n\n";
-	graph.depthFirstSearch(0, printValue);
+	graph.DFS(root);
 
 	std::cout << "\n\n=== BFS ===\n\n";
-	graph.breathFirstSearch(0, printValue);
+	graph.BFS(root);
 
 	std::cout << "\n\n";
+
+}
+
+void test4() {
 
 }
 
