@@ -62,7 +62,7 @@ protected:
 };
 
 
-class GraphUint : Graph<unsigned> {
+class GraphUint : public Graph<unsigned> {
 public:
 	GraphUint();
 
@@ -160,7 +160,7 @@ inline void Graph<T>::bfs(const T& value, UnaryFunction visit){
 	std::queue<const T*> queue;
 	queue.emplace(&it->first);
 	
-	// Create set to store all visited nodes
+	// Create set to store all already enqueued and visited nodes
 	ChildrenPtrs visited{&it->first};
 
 	// Enqueue the children and their own children until all nodes are visited
@@ -176,9 +176,9 @@ inline void Graph<T>::bfs(const T& value, UnaryFunction visit){
 		// Enque the node's children
 		for (const auto& childPtr : m_table.at(cref)) {
 
-			// Attempt marking node as visited
-			if (visited.emplace().second)
-				queue.emplace(childPtr); // If so, node was not  marked: enqueue the node
+			// If insertion succeeeds...
+			if (visited.emplace(childPtr).second)
+				queue.emplace(childPtr); // ... node was not  marked: enqueue the node
 		}
 	}
 	
