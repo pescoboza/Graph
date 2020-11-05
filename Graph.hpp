@@ -24,6 +24,11 @@ public:
 	Graph();
 	Graph(const std::vector<std::pair<T, std::vector<T>>>& adjList);
 
+	// Returns the number of nodes in the graph.
+	// Time complexity: O(1)
+	// Space complexity: O(1)
+	size_t size()const;
+
 	// Loads graph from adjacency list, overwriting all previous data.
 	// Time complexity: O(n^2)
 	// Space complexity: O(1)
@@ -35,7 +40,7 @@ public:
 	// Space complexity: O(1)
 	Graph& addNodeRef(const T& value, const std::vector<T>& parents, const std::vector<T>& children);
 	
-	// Add a node given the value, its parents and children. It register all the
+	// Add a node given the value, its parents and children. It registers all the
 	// new nodes in the adjacency list.
 	// Useful for passing intiliazer lists.
 	// Time complexity: O(n)
@@ -68,6 +73,16 @@ public:
 	// Time complexity: O(n)
 	// Space complexity: O(n)
 	Graph& BFS(const T& head, std::ostream& out = std::cout);
+
+	
+	bool isTree();
+
+
+	// Returns the topolgical sort in a stack by using DFS.
+	// Time complexity: O(n)
+	// Space complexity: O(n)
+	std::vector<const T*> topologicalSort(const T& head, std::vector<const T*>& stack);
+	std::vector<const T*> topologicalSort(const T& head);
 
 protected:
 	// Helper for breadth first search.
@@ -106,6 +121,11 @@ inline Graph<T>::Graph(const std::vector<std::pair<T, std::vector<T>>>& adjList)
 }
 
 template<typename T>
+inline size_t Graph<T>::size() const{
+	return m_table.size();
+}
+
+template<typename T>
 inline void Graph<T>::loadGraph(const std::vector<std::pair<T, std::vector<T>>>& adjList){
 	m_table.clear();
 	std::vector<T> empty;
@@ -116,6 +136,10 @@ inline void Graph<T>::loadGraph(const std::vector<std::pair<T, std::vector<T>>>&
 template<typename T>
 inline Graph<T>& Graph<T>::addNodeRef(const T& value, const std::vector<T>& parents, const std::vector<T>& children){
 	
+	// Do not insert islands
+	if (parents.empty() && children.empty())
+		return *this;
+
 	// Emplace given node (map returns a pair<iterator,bool> of inserted or already present element)
 	auto empPair{ m_table.emplace(value, ChildrenPtrs{}) };
 	
@@ -173,6 +197,24 @@ template<typename T>
 inline Graph<T>& Graph<T>::BFS(const T& head, std::ostream& out){
 	bfs(head, [&out](const T& v) {out << v << " -> "; });
 	return *this;
+}
+
+template<typename T>
+inline std::vector<const T*> Graph<T>::topologicalSort(const T& head, std::vector<const T*>& stack){
+	auto insertStack{
+		[&stack](const T& value) {
+			stack.push_back(*value);
+		}
+	};
+
+	breathFirstSearch(head, insertStack);
+	return stack;
+}
+
+template<typename T>
+inline std::vector<const T*> Graph<T>::topologicalSort(const T& head){
+	std::vector<const T*> stack;
+	return topologicalSort(head, stack);
 }
 
 
