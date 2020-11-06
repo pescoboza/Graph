@@ -265,8 +265,9 @@ inline std::vector<const T*> Graph<T>::topologicalSort(const T& head){
 
 template<typename T>
 inline bool Graph<T>::isBipartiteGraph(const T& head){
-	std::cout << "IMPLEMENT ME!";
-	return false;
+	ChildPtrs red;
+	ChildPtrs blue;
+	return isBiGraph(head, false, red, blue);
 }
 
 template<typename T>
@@ -308,7 +309,7 @@ inline bool Graph<T>::isBiGraph(const T& value, bool prevWasRed, ChildPtrs& red,
 	ChildPtrs& nextColor { prevWasRed ? red  : blue};
 
 	// Check if the node already had the opposite color mark,
-	bool wasInOppCol{ oppColor.find(&it->first) != oppColor.end() };
+	bool wasInOppCol{ nextColor.find(&it->first) != nextColor.end() };
 
 	// If the node was already marked as having the opposite color
 	// to the current, we found two adjacent nodes with the same color.
@@ -332,7 +333,7 @@ inline bool Graph<T>::isBiGraph(const T& value, bool prevWasRed, ChildPtrs& red,
 	for (const auto& childPtr : it->second) {
 		
 		// Go a level deeper and stop if we find a color mismatch.
-		if (!isBiGraph(value, !prevWasRed, red, blue))
+		if (!isBiGraph(*childPtr, !prevWasRed, red, blue))
 			return false;
 	}	
 }
@@ -398,22 +399,20 @@ inline void Graph<T>::dfs(const T& value, UnaryFunction visit, ChildPtrs& visite
 	if (it == m_table.end())
 		return;
 
+	// Remember node as visited
+	if (!visited.emplace(&it->first).second)
+		return;
+	
 	{
 		// Visit the node
 		const T& cref{ it->first };
 		visit(cref);
 	}
 	
-	// Remember node as visited
-	visited.emplace(&it->first);
 	
 	// Iterate through children
-	for (const auto& childPtr : it->second) {
-		
-		// If the child node is not found in the visited set, it must be visited next
-		if (visited.find(childPtr) != visited.end())
-			dfs(*childPtr, visit, visited); // Pass olympic torch
-	}
+	for (const auto& childPtr : it->second) 
+		dfs(*childPtr, visit, visited); // Pass olympic torch
 }
 
 #endif // !GRAPH_HPP
