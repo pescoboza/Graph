@@ -112,14 +112,14 @@ void test4() {
 
 
 int main() {
-	std::cout << "======= Test 1 =======\n";
-	test1();
+	//std::cout << "======= Test 1 =======\n";
+	//test1();
 
-	std::cout << "======= Test 2 =======\n";
-	test2();
-	
-	std::cout << "======= Test 3 =======\n";
-	test3();
+	//std::cout << "======= Test 2 =======\n";
+	//test2();
+	//
+	//std::cout << "======= Test 3 =======\n";
+	//test3();
 
 	std::cout << "======= Test 4 =======\n";
 	test4();

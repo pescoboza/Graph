@@ -288,7 +288,7 @@ inline bool Graph<T>::hasCycle(const T& value, ChildPtrs& visited){
 		bool wasAlreadyVisited{ !visited.emplace(childPtr).second };
 
 		// If already visited or child has cycle, we found a cycle
-		if (wasAlreadyVisited || hasCycle(value, visited))
+		if (wasAlreadyVisited || hasCycle(*childPtr, visited))
 			return true;
 	}
 
