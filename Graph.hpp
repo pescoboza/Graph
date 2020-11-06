@@ -89,7 +89,7 @@ public:
 	// Returns the topolgical sort in a stack by using DFS.
 	// Time complexity: O(n)
 	// Space complexity: O(n)
-	std::vector<const T*> topologicalSort(const T& head, std::vector<const T*>& stack);
+	std::vector<const T*>& topologicalSort(const T& head, std::vector<const T*>& stack);
 	std::vector<const T*> topologicalSort(const T& head);
 
 	// Tells if the graph is a bipartite graph using DFS from the given root.
@@ -227,14 +227,14 @@ inline Graph<T>& Graph<T>::BFS(const T& head, std::ostream& out){
 template<typename T>
 inline bool Graph<T>::isTree(const T& head){
 	ChildrenPtrs visited;
-	return hasCycle(head, visited);
+	return !hasCycle(head, visited);
 }
 
 template<typename T>
-inline std::vector<const T*> Graph<T>::topologicalSort(const T& head, std::vector<const T*>& stack){
+inline std::vector<const T*>& Graph<T>::topologicalSort(const T& head, std::vector<const T*>& stack){
 	auto insertStack{
 		[&stack](const T& value) {
-			stack.push_back(*value);
+			stack.push_back(&value);
 		}
 	};
 
@@ -245,12 +245,13 @@ inline std::vector<const T*> Graph<T>::topologicalSort(const T& head, std::vecto
 template<typename T>
 inline std::vector<const T*> Graph<T>::topologicalSort(const T& head){
 	std::vector<const T*> stack;
-	return topologicalSort(head, stack);
+	topologicalSort(head, stack);
+	return stack;
 }
 
 template<typename T>
-inline bool Graph<T>::isBipartiteGraph(const T& head)
-{
+inline bool Graph<T>::isBipartiteGraph(const T& head){
+	std::cout << "IMPLEMENT ME!";
 	return false;
 }
 

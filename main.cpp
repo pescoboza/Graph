@@ -15,6 +15,12 @@ void printReverse(const T& container, const char* sep = " ", std::ostream& out =
 		out << *it << sep;
 }
 
+template <class T>
+void printReversePtrs(const T& container, const char* sep = " ", std::ostream& out = std::cout) {
+	for (auto it{ container.rbegin() }; it != container.rend(); ++it)
+		out << **it << sep;
+}
+
 // Helper to run test cases and print to given ostream.
 template <class Container, typename K>
 void testBase(Container& adt, const K& key, std::ostream& out = std::cout) {
@@ -32,7 +38,7 @@ void testBase(Container& adt, const K& key, std::ostream& out = std::cout) {
 	adt.BFS(key);
 
 	out << "\n\n=== Topological Sort ===\n\n";
-	printReverse(adt.topologicalSort(key));
+	printReversePtrs(adt.topologicalSort(key));
 
 	out << "\n\n";
 }
