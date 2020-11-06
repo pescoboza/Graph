@@ -8,10 +8,33 @@
 #include <string>
 #include <vector>
 
+// Helper to print container in reverse that supports random access iterators.
 template <class T>
 void printReverse(const T& container, const char* sep = " ", std::ostream& out = std::cout) {
 	for (auto it{ container.rbegin() }; it != container.rend(); ++it)
 		out << *it << sep;
+}
+
+// Helper to run test cases and print to given ostream.
+template <class Container, typename K>
+void testBase(Container& adt, const K& key, std::ostream& out = std::cout) {
+
+	out << "=== Adjacency List ===\n\n";
+	adt.printAdjList();
+
+	out << "Is tree: " << std::boolalpha << adt.isTree(key) << '\n';
+	out << "Is bipartite graph: " << std::boolalpha << adt.isBipartiteGraph(key) << "\n\n";
+
+	out << "\n\n=== DFS ===\n\n";
+	adt.DFS(key);
+
+	out << "\n\n=== BFS ===\n\n";
+	adt.BFS(key);
+
+	out << "\n\n=== Topological Sort ===\n\n";
+	printReverse(adt.topologicalSort(key));
+
+	out << "\n\n";
 }
 
 // Basic functionality test with simplest insertion method:
@@ -27,19 +50,7 @@ void test1() {
 
 	auto root{ 0 };
 
-	std::cout << "=== Adjacency List ===\n\n";
-	graph.printAdjList();
-
-	std::cout << "\n\n=== DFS ===\n\n";
-	graph.DFS(root);
-	
-	std::cout << "\n\n=== BFS ===\n\n";
-	graph.BFS(root);
-
-	std::cout << "\n\n=== Topological Sort ===\n\n";
-	printReverse(graph.topologicalSort(root));
-		
-	std::cout << "\n\n";
+	testBase(graph, root);	
 }
 
 // Test for complex data types.
@@ -52,19 +63,7 @@ void test2() {
 
 	auto root{ "hello" };
 
-	std::cout << "=== Adjacency List ===\n\n";
-	graph.printAdjList();
-
-	std::cout << "\n\n=== DFS ===\n\n";
-	graph.DFS(root);
-
-	std::cout << "\n\n=== BFS ===\n\n";
-	graph.BFS(root);
-
-	std::cout << "\n\n=== Topological Sort ===\n\n";
-	printReverse(graph.topologicalSort(root));
-
-	std::cout << "\n\n";
+	testBase(graph, root);
 }
 
 // Test for template specialization for unsigned int with 
@@ -83,20 +82,7 @@ void test3() {
 	GraphUint graph{adjMat};
 	auto root{ 2U };
 
-	std::cout << "=== Adjacency List ===\n\n";
-	graph.printAdjList();
-
-	std::cout << "\n\n=== DFS ===\n\n";
-	graph.DFS(root);
-
-	std::cout << "\n\n=== BFS ===\n\n";
-	graph.BFS(root);
-
-	std::cout << "\n\n=== Topological Sort ===\n\n";
-	printReverse(graph.topologicalSort(root));
-
-	std::cout << "\n\n";
-
+	testBase(graph, root);
 }
 
 
@@ -114,19 +100,7 @@ void test4() {
 	GraphUint graph{ adjList };
 	auto root{ 0U };
 
-	std::cout << "=== Adjacency List ===\n\n";
-	graph.printAdjList();
-
-	std::cout << "\n\n=== DFS ===\n\n";
-	graph.DFS(root);
-
-	std::cout << "\n\n=== BFS ===\n\n";
-	graph.BFS(root);
-
-	std::cout << "\n\n=== Topological Sort ===\n\n";
-	printReverse(graph.topologicalSort(root));
-
-	std::cout << "\n\n";
+	testBase(graph, root);
 }
 
 
