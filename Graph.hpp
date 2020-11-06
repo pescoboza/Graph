@@ -29,6 +29,7 @@ public:
 	// Space complexity: O(1)
 	size_t size()const;
 
+
 	// Loads graph from adjacency list, overwriting all previous data.
 	// Time complexity: O(n^2)
 	// Space complexity: O(1)
@@ -44,8 +45,13 @@ public:
 	// new nodes in the adjacency list.
 	// Useful for passing intiliazer lists.
 	// Time complexity: O(n)
-	// Space complexity: O(n)
+	// Space complexity: O(1)
 	Graph& addNodeCpy(const T& value, std::vector<T> parents, std::vector<T> children);
+
+	// Add a singular edge from parent to child.
+	// Time complexity: O(1)
+	// Space complexity: O(1)
+	Graph& addEdge(const T& parent, const T& child);
 	
 	// Executes visit function on each node value with a breath first search.
 	// Time complexity: O(n)
@@ -190,6 +196,11 @@ inline Graph<T>& Graph<T>::addNodeCpy(const T& value, std::vector<T> parents, st
 }
 
 template<typename T>
+inline Graph<T>& Graph<T>::addEdge(const T& parent, const T& child) {
+	return addNodeCpy(parent, {}, {child});
+}
+
+template<typename T>
 inline void Graph<T>::printAdjList(std::ostream& out) const{
 	for (const auto& nodePair : m_table) {
 		out << nodePair.first << " { ";
@@ -235,6 +246,12 @@ template<typename T>
 inline std::vector<const T*> Graph<T>::topologicalSort(const T& head){
 	std::vector<const T*> stack;
 	return topologicalSort(head, stack);
+}
+
+template<typename T>
+inline bool Graph<T>::isBipartiteGraph(const T& head)
+{
+	return false;
 }
 
 template<typename T>
