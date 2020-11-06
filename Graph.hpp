@@ -15,10 +15,10 @@
 
 template <typename T>
 class Graph{
-	using ChildrenPtrs = std::unordered_set<const T*>;
+	using ChildPtrs = std::unordered_set<const T*>;
 
 protected:
-	std::unordered_map<T, ChildrenPtrs> m_table;
+	std::unordered_map<T, ChildPtrs> m_table;
 
 public:
 	Graph();
@@ -27,8 +27,12 @@ public:
 	// Returns the number of nodes in the graph.
 	// Time complexity: O(1)
 	// Space complexity: O(1)
-	size_t size()const;
+	size_t size() const;
 
+	// Returns if the node value is in the graph.
+	// Time complexity: O(1)
+	// Space complexity: O(1)
+	bool find(const T& value) const;
 
 	// Loads graph from adjacency list, overwriting all previous data.
 	// Time complexity: O(n^2)
@@ -109,13 +113,19 @@ protected:
 	// Time complexity: O(n)
 	// Space complexity: O(n)
 	template <class UnaryFunction>
-	void dfs(const T& value, UnaryFunction visit, ChildrenPtrs& visited);
+	void dfs(const T& value, UnaryFunction visit, ChildPtrs& visited);
 
 	// Helper to look for cycles with DFS.
 	// Throws if the node is not found.
 	// Time complexity: O(n)
 	// Space complexity: O(n)
-	bool hasCycle(const T& value, ChildrenPtrs& visited);
+	bool hasCycle(const T& value, ChildPtrs& visited);
+
+	// Helper to tell if DFS path has bipartite graph.
+	// Throws if the node is not found.
+	// Time complexity: O(n)
+	// Space complexity: O(n)
+	bool isBiGraph(const T& value, bool prevWasRed, ChildPtrs& red, ChildPtrs& blue);
 };
 
 
@@ -146,6 +156,11 @@ inline size_t Graph<T>::size() const{
 }
 
 template<typename T>
+inline bool Graph<T>::find(const T& value) const{
+	return m_table.find(value) != m_table.end();
+}
+
+template<typename T>
 inline void Graph<T>::loadGraph(const std::vector<std::pair<T, std::vector<T>>>& adjList){
 	m_table.clear();
 	std::vector<T> empty;
@@ -161,18 +176,17 @@ inline Graph<T>& Graph<T>::addNodeRef(const T& value, const std::vector<T>& pare
 		return *this;
 
 	// Emplace given node (map returns a pair<iterator,bool> of inserted or already present element)
-	auto empPair{ m_table.emplace(value, ChildrenPtrs{}) };
+	auto empPair{ m_table.emplace(value, ChildPtrs{}) };
 	
 	// Readability aliases
 	const T& insertedNodeOwner{empPair.first->first};
-	ChildrenPtrs& insertedNodeChildren{ empPair.first->second };
+	ChildPtrs& insertedNodeChildren{ empPair.first->second };
 
-	
 	// Insert children
 	for (auto& child : children) {
 		
 		// Register node in hash table, does nothing if already present
-		const T& childOwner{ m_table.emplace(child, ChildrenPtrs{}).first->first };
+		const T& childOwner{ m_table.emplace(child, ChildPtrs{}).first->first };
 
 		// Add the child to the parent, does nothing if already present
 		insertedNodeChildren.emplace(&childOwner);
@@ -181,7 +195,7 @@ inline Graph<T>& Graph<T>::addNodeRef(const T& value, const std::vector<T>& pare
 	for (auto& parent : parents) {
 
 		// Register parent node, does nothing if already present
-		auto& parentNodeChildren{ m_table.emplace(parent, ChildrenPtrs{}).first->second};
+		auto& parentNodeChildren{ m_table.emplace(parent, ChildPtrs{}).first->second};
 
 		// Add the main node to the parents, if not already present
 		parentNodeChildren.emplace(&insertedNodeOwner);
@@ -213,7 +227,7 @@ inline void Graph<T>::printAdjList(std::ostream& out) const{
 
 template<typename T>
 inline Graph<T>& Graph<T>::DFS(const T& head, std::ostream& out){
-	ChildrenPtrs visited;
+	ChildPtrs visited;
 	dfs(head, [&out](const T& v) {out << v << " -> "; }, visited);
 	return *this;
 }
@@ -226,7 +240,7 @@ inline Graph<T>& Graph<T>::BFS(const T& head, std::ostream& out){
 
 template<typename T>
 inline bool Graph<T>::isTree(const T& head){
-	ChildrenPtrs visited;
+	ChildPtrs visited;
 	return !hasCycle(head, visited);
 }
 
@@ -256,7 +270,7 @@ inline bool Graph<T>::isBipartiteGraph(const T& head){
 }
 
 template<typename T>
-inline bool Graph<T>::hasCycle(const T& value, ChildrenPtrs& visited){
+inline bool Graph<T>::hasCycle(const T& value, ChildPtrs& visited){
 	
 	// Look for value in node in table and throw if not found
 	auto it{ m_table.find(value) };
@@ -281,6 +295,48 @@ inline bool Graph<T>::hasCycle(const T& value, ChildrenPtrs& visited){
 	return false;
 }
 
+template<typename T>
+inline bool Graph<T>::isBiGraph(const T& value, bool prevWasRed, ChildPtrs& red, ChildPtrs& blue){
+	
+	// Look for the value in graph, throw if not found
+	auto it{ m_table.find(value) };
+	if (it == m_table.end())
+		throw std::invalid_argument{ "Invalid value: not found." };
+
+	// Get the current and opposite colors
+	ChildPtrs& currColor { prevWasRed ? blue : red };
+	ChildPtrs& nextColor { prevWasRed ? red  : blue};
+
+	// Check if the node already had the opposite color mark,
+	bool wasInOppCol{ oppColor.find(&it->first) != oppColor.end() };
+
+	// If the node was already marked as having the opposite color
+	// to the current, we found two adjacent nodes with the same color.
+	// This means the DFS traversal path is not a bipartite graph.
+	if (wasInOppCol)
+		return false;
+
+	// Check if the node was already marked with the current color.
+	bool wasInCurrCol{ currColor.find(&it->first) != currColor.end() };
+
+	// If the node was already marked as visited in the current color,
+	// we can skip visiting its children.
+	if (wasInCurrCol)
+		return true;
+
+	// It the node was not visited before, and theres is no color mismatch,
+	// insert the current node in the current color.
+	currColor.emplace(&it->first);
+
+	// Iterate through the children
+	for (const auto& childPtr : it->second) {
+		
+		// Go a level deeper and stop if we find a color mismatch.
+		if (!isBiGraph(value, !prevWasRed, red, blue))
+			return false;
+	}	
+}
+
 
 template<typename T>
 template<class UnaryFunction>
@@ -292,7 +348,7 @@ inline Graph<T>& Graph<T>::breathFirstSearch(const T& head, UnaryFunction visit)
 template<typename T>
 template<class UnaryFunction>
 inline Graph<T>& Graph<T>::depthFirstSearch(const T& head, UnaryFunction visit){
-	ChildrenPtrs visited;
+	ChildPtrs visited;
 	dfs(head, visit, visited);
 	return *this;
 }
@@ -311,7 +367,7 @@ inline void Graph<T>::bfs(const T& value, UnaryFunction visit){
 	queue.emplace(&it->first);
 	
 	// Create set to store all already enqueued and visited nodes
-	ChildrenPtrs visited{&it->first};
+	ChildPtrs visited{&it->first};
 
 	// Enqueue the children and their own children until all nodes are visited
 	while (!queue.empty()) {
@@ -324,7 +380,7 @@ inline void Graph<T>::bfs(const T& value, UnaryFunction visit){
 		visit(cref);
 
 		// Enque the node's children
-		for (const auto& childPtr : m_table.at(cref)) {
+		for (const auto& childPtr : it->second) {
 
 			// If insertion succeeeds...
 			if (visited.emplace(childPtr).second)
@@ -336,7 +392,7 @@ inline void Graph<T>::bfs(const T& value, UnaryFunction visit){
 
 template<typename T>
 template<class UnaryFunction>
-inline void Graph<T>::dfs(const T& value, UnaryFunction visit, ChildrenPtrs& visited){
+inline void Graph<T>::dfs(const T& value, UnaryFunction visit, ChildPtrs& visited){
 	// Look for value in node list
 	auto it{m_table.find(value)};
 	if (it == m_table.end())
@@ -354,8 +410,8 @@ inline void Graph<T>::dfs(const T& value, UnaryFunction visit, ChildrenPtrs& vis
 	// Iterate through children
 	for (const auto& childPtr : it->second) {
 		
-		// If new node is inserted, it must be visited
-		if (visited.emplace(childPtr).second)
+		// If the child node is not found in the visited set, it must be visited next
+		if (visited.find(childPtr) != visited.end())
 			dfs(*childPtr, visit, visited); // Pass olympic torch
 	}
 }

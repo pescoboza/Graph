@@ -28,7 +28,7 @@ void testBase(Container& adt, const K& key, std::ostream& out = std::cout) {
 	out << "=== Adjacency List ===\n\n";
 	adt.printAdjList();
 
-	out << "Is tree: " << std::boolalpha << adt.isTree(key) << '\n';
+	out << "\n\nIs tree: " << std::boolalpha << adt.isTree(key) << '\n';
 	out << "Is bipartite graph: " << std::boolalpha << adt.isBipartiteGraph(key) << "\n\n";
 
 	out << "\n\n=== DFS ===\n\n";
