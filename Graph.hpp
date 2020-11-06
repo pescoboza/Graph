@@ -75,7 +75,10 @@ public:
 	Graph& BFS(const T& head, std::ostream& out = std::cout);
 
 	
-	bool isTree();
+	// Returns if the graph traversed by DFS in the given node is a tree.
+	// Time complexity: O(n)
+	// Space complexity: O(n)
+	bool isTree(const T& head);
 
 
 	// Returns the topolgical sort in a stack by using DFS.
@@ -84,18 +87,28 @@ public:
 	std::vector<const T*> topologicalSort(const T& head, std::vector<const T*>& stack);
 	std::vector<const T*> topologicalSort(const T& head);
 
+	// Tells if the graph is a bipartite graph using DFS from the given root.
+	bool bipartiteGraph(const T& head);
+
+
 protected:
 	// Helper for breadth first search.
 	// Time complexity: O(n)
-	// Space complexity: O(1)
+	// Space complexity: O(n)
 	template <class UnaryFunction>
 	void bfs(const T& value, UnaryFunction visit);
 	
 	// Helper for depth first search.
 	// Time complexity: O(n)
-	// Space complexity: O(1)
+	// Space complexity: O(n)
 	template <class UnaryFunction>
 	void dfs(const T& value, UnaryFunction visit, ChildrenPtrs& visited);
+
+	// Helper to look for cycles with DFS.
+	// Throws if the node is not found.
+	// Time complexity: O(n)
+	// Space complexity: O(n)
+	bool hasCycle(const T& value, ChildrenPtrs& visited);
 };
 
 
@@ -200,6 +213,12 @@ inline Graph<T>& Graph<T>::BFS(const T& head, std::ostream& out){
 }
 
 template<typename T>
+inline bool Graph<T>::isTree(const T& head){
+	ChildrenPtrs visited;
+	return hasCycle(head, visited);
+}
+
+template<typename T>
 inline std::vector<const T*> Graph<T>::topologicalSort(const T& head, std::vector<const T*>& stack){
 	auto insertStack{
 		[&stack](const T& value) {
@@ -215,6 +234,32 @@ template<typename T>
 inline std::vector<const T*> Graph<T>::topologicalSort(const T& head){
 	std::vector<const T*> stack;
 	return topologicalSort(head, stack);
+}
+
+template<typename T>
+inline bool Graph<T>::hasCycle(const T& value, ChildrenPtrs& visited){
+	
+	// Look for value in node in table and throw if not found
+	auto it{ m_table.find(value) };
+	if (it == m_table.end())
+		throw std::invalid_argument{ "Invalid value: not found." };
+
+	// Remember node as visited
+	visited.emplace(&it->first);
+
+	// Iterate through children
+	for (const auto& childPtr : it->second) {
+
+		// Attempt to visit the node and check if it was already visited
+		bool wasAlreadyVisited{ !visited.emplace(childPtr).second };
+
+		// If already visited or child has cycle, we found a cycle
+		if (wasAlreadyVisited || hasCycle(value, visited))
+			return true;
+	}
+
+	// No node was visited twice, no cycle
+	return false;
 }
 
 
