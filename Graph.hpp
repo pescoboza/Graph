@@ -252,7 +252,7 @@ inline std::vector<const T*>& Graph<T>::topologicalSort(const T& head, std::vect
 		}
 	};
 
-	breathFirstSearch(head, insertStack);
+	depthFirstSearch(head, insertStack);
 	return stack;
 }
 
@@ -335,7 +335,10 @@ inline bool Graph<T>::isBiGraph(const T& value, bool prevWasRed, ChildPtrs& red,
 		// Go a level deeper and stop if we find a color mismatch.
 		if (!isBiGraph(*childPtr, !prevWasRed, red, blue))
 			return false;
-	}	
+	}
+
+	// To remove compiler warning.
+	return true;
 }
 
 
@@ -366,26 +369,26 @@ inline void Graph<T>::bfs(const T& value, UnaryFunction visit){
 	// Create queue to store all children
 	std::queue<const T*> queue;
 	queue.emplace(&it->first);
-	
-	// Create set to store all already enqueued and visited nodes
-	ChildPtrs visited{&it->first};
 
+	// Create set to store all already enqueued and visited nodes
+	ChildPtrs enqueued{ &it->first };
+	
 	// Enqueue the children and their own children until all nodes are visited
 	while (!queue.empty()) {
 		
 		// Get first element in queue
-		const T& cref{*queue.front()};
+		const T* currNodePtr{queue.front()};
 		queue.pop();
 		
 		// Visit the node
-		visit(cref);
+		visit(*currNodePtr);
 
-		// Enque the node's children
-		for (const auto& childPtr : it->second) {
-
-			// If insertion succeeeds...
-			if (visited.emplace(childPtr).second)
-				queue.emplace(childPtr); // ... node was not  marked: enqueue the node
+		// Enque all unvisited children nodes
+		for (const auto& childPtr : m_table.at(*currNodePtr)) {
+			
+			// If the node was not found and thus got marked as enqueued, enque it
+			if (enqueued.emplace(childPtr).second)
+				queue.push(childPtr);
 		}
 	}
 	

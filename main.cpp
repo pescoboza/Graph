@@ -95,12 +95,12 @@ void test3() {
 // Testing construction from adjacency list.
 void test4() {
 	std::vector<std::pair<unsigned, std::vector<unsigned>>> adjList{
-		{0,{ 1, 2 }},
-		{1,{ 3, 4 }},
-		{2,{ 3    }},
-		{3,{      }},
-		{4,{ 5    }},
-		{5,{ 1, 3 }}
+		{0,{ 1, 2    }},
+		{1,{ 3, 4, 5 }},
+		{2,{         }},
+		{3,{         }},
+		{4,{         }},
+		{5,{         }}
 	};
 
 	GraphUint graph{ adjList };
