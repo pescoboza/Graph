@@ -80,7 +80,6 @@ public:
 	// Space complexity: O(n)
 	bool isTree(const T& head);
 
-
 	// Returns the topolgical sort in a stack by using DFS.
 	// Time complexity: O(n)
 	// Space complexity: O(n)
@@ -88,7 +87,9 @@ public:
 	std::vector<const T*> topologicalSort(const T& head);
 
 	// Tells if the graph is a bipartite graph using DFS from the given root.
-	bool bipartiteGraph(const T& head);
+	// Time complexity: O(n)
+	// Space complexity: O(n)
+	bool isBipartiteGraph(const T& head);
 
 
 protected:
