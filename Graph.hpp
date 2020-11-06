@@ -77,12 +77,12 @@ public:
 	// Traverses nodes by depth first search and print the values in order.
 	// Time complexity: O(n)
 	// Space complexity: O(n)
-	Graph& DFS(const T& head, std::ostream& out = std::cout);
+	Graph& DFS(const T& head, const char* sep = " ", std::ostream& out = std::cout);
 
 	// Traverses nodes by breath first search and print the values in order.
 	// Time complexity: O(n)
 	// Space complexity: O(n)
-	Graph& BFS(const T& head, std::ostream& out = std::cout);
+	Graph& BFS(const T& head, const char* sep = " ", std::ostream& out = std::cout);
 
 	
 	// Returns if the graph traversed by DFS in the given node is a tree.
@@ -226,15 +226,15 @@ inline void Graph<T>::printAdjList(std::ostream& out) const{
 }
 
 template<typename T>
-inline Graph<T>& Graph<T>::DFS(const T& head, std::ostream& out){
+inline Graph<T>& Graph<T>::DFS(const T& head, const char* sep,  std::ostream& out){
 	ChildPtrs visited;
-	dfs(head, [&out](const T& v) {out << v << " -> "; }, visited);
+	dfs(head, [&sep, &out](const T& v) {out << v << sep; }, visited);
 	return *this;
 }
 
 template<typename T>
-inline Graph<T>& Graph<T>::BFS(const T& head, std::ostream& out){
-	bfs(head, [&out](const T& v) {out << v << " -> "; });
+inline Graph<T>& Graph<T>::BFS(const T& head, const char* sep, std::ostream& out){
+	bfs(head, [&sep, &out](const T& v) {out << v << sep; });
 	return *this;
 }
 
