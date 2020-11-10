@@ -20,18 +20,37 @@ public:
 	UniquePtrCompWrapper(const UniquePtrCompWrapper& copy) : UniquePtrCompWrapper{*copy} {}
 
 
+
+	const T& operator*() const { return *m_data; }
+	T& operator*() { return *m_data.get(); }
+	const T& operator->() const { return *m_data; }
+	T& operator->() { return *m_data.get() }
+	bool operator bool()const { return m_data == nullptr };
+
+
 	friend bool operator==(const UniquePtrCompWrapper& l, const UniquePtrCompWrapper& r) {
+		if ((l.m_data == nullptr) ^ (r.m_data == nullptr)) 
+			return false;
+		
 		return *l == *r;
 	}
 
 	friend bool operator<(const UniquePtrCompWrapper& l, const UniquePtrCompWrapper& r) {
-		return *l < *r;
+		if ((l.m_data == nullptr) ^ (r.m_data == nullptr))
+			return false;
 
+		return *l < *r;
 	}
 
 	friend bool operator>(const UniquePtrCompWrapper& l, const UniquePtrCompWrapper& r) {
+		if ((l.m_data == nullptr) ^ (r.m_data == nullptr))
+			return false;
+		
 		return *l > *r;
 	}
+
+	
+
 };
 
 #endif // !UNIQUE_PTR_COMP_WRAPPER_HPP

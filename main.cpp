@@ -4,6 +4,7 @@
 // TC1031.501
 
 #include "fileio.hpp"
+#include "UniquePtrCompWrapper.hpp"
 #include "Graph.hpp"
 #include "Client.hpp"
 #include "Listener.hpp"
@@ -53,9 +54,11 @@ std::string parseIpStr(const std::string& line) {
 
 
 int main() {
+	using NodeNetPtr = UniquePtrCompWrapper<NetNode>;
+	using NetGraph = Graph<NodeNetPtr>;
 
+	NetGraph graph;
 	
-
 	{
 		std::vector<std::string> lines;
 
@@ -66,7 +69,8 @@ int main() {
 
 			// Enter the data from the file int othe tree
 			for (const auto& line : lines) {
-				/* Insert data into net graph*/
+				
+				NodeNetPtr 
 
 			}
 		} // lines goes out of scope here

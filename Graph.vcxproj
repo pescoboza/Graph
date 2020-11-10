@@ -139,10 +139,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Client.hpp" />
+    <ClInclude Include="fileio.hpp" />
     <ClInclude Include="Graph.hpp" />
+    <ClInclude Include="IpAddress.hpp" />
+    <ClInclude Include="NetNode.hpp" />
+    <ClInclude Include="Listener.hpp" />
+    <ClInclude Include="UniquePtrCompWrapper.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="fileio.cpp" />
     <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="IpAddress.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
