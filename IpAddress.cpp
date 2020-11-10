@@ -3,7 +3,11 @@
 #include <sstream>
 
 ip::IpAddress::IpAddress(unsigned part1, unsigned part2, unsigned part3, unsigned part4, unsigned port) :
-	m_part1{ part1 }, m_part2{ m_part2 }, m_part3{ m_part3 }, m_part4{ m_part4 }, m_port{ m_port }{}
+	m_part1{ part1 }, 
+	m_part2{ part2 }, 
+	m_part3{ part3 }, 
+	m_part4{ part4 }, 
+	m_port{ port }{}
 
 
 ip::IpAddress::IpAddress(const std::string& ipStr) {
@@ -36,32 +40,32 @@ std::string ip::IpAddress::str() const {
 }
 
 
-bool ip::operator==(const ip::IpAddress& rhs, const ip::IpAddress& lhs) {
-	return (rhs.m_part1 == rhs.m_part1 &&
-		rhs.m_part2 == rhs.m_part2 &&
-		rhs.m_part3 == rhs.m_part3 &&
-		rhs.m_part4 == rhs.m_part4 &&
-		rhs.m_port == rhs.m_port);
+bool ip::operator==(const ip::IpAddress& l, const ip::IpAddress& r) {
+	return (l.m_part1 == r.m_part1 &&
+		l.m_part2 == r.m_part2 &&
+		l.m_part3 == r.m_part3 &&
+		l.m_part4 == r.m_part4 &&
+		l.m_port == r.m_port);
 }
 
-bool ip::operator>(const ip::IpAddress& rhs, const ip::IpAddress& lhs) {
-	if (rhs.m_part1 > lhs.m_part1) { return true; }
-	else if (rhs.m_part1 < lhs.m_part1) { return false; }
+bool ip::operator>(const ip::IpAddress& l, const ip::IpAddress& r) {
+	if (l.m_part1 > r.m_part1) { return true; }
+	else if (l.m_part1 < r.m_part1) { return false; }
 	else {
 
-		if (rhs.m_part2 > lhs.m_part2) { return true; }
-		else if (rhs.m_part2 < lhs.m_part2) { return false; }
+		if (l.m_part2 > r.m_part2) { return true; }
+		else if (l.m_part2 < r.m_part2) { return false; }
 		else {
 
-			if (rhs.m_part3 > lhs.m_part3) { return true; }
-			else if (rhs.m_part3 < lhs.m_part3) { return false; }
+			if (l.m_part3 > r.m_part3) { return true; }
+			else if (l.m_part3 < r.m_part3) { return false; }
 			else {
 
-				if (rhs.m_part4 > lhs.m_part4) { return true; }
-				else if (rhs.m_part4 < lhs.m_part4) { return false; }
+				if (l.m_part4 > r.m_part4) { return true; }
+				else if (l.m_part4 < r.m_part4) { return false; }
 				else {
 
-					if (rhs.m_port > lhs.m_port) { return true; }
+					if (l.m_port > r.m_port) { return true; }
 
 				}
 			}
@@ -71,24 +75,24 @@ bool ip::operator>(const ip::IpAddress& rhs, const ip::IpAddress& lhs) {
 	return false;
 }
 
-bool ip::operator<(const ip::IpAddress& rhs, const ip::IpAddress& lhs) {
-	if (rhs.m_part1 < lhs.m_part1) { return true; }
-	else if (rhs.m_part1 > lhs.m_part1) { return false; }
+bool ip::operator<(const ip::IpAddress& l, const ip::IpAddress& r) {
+	if (l.m_part1 < r.m_part1) { return true; }
+	else if (l.m_part1 > r.m_part1) { return false; }
 	else {
 
-		if (rhs.m_part2 < lhs.m_part2) { return true; }
-		else if (rhs.m_part2 > lhs.m_part2) { return false; }
+		if (l.m_part2 < r.m_part2) { return true; }
+		else if (l.m_part2 > r.m_part2) { return false; }
 		else {
 
-			if (rhs.m_part3 < lhs.m_part3) { return true; }
-			else if (rhs.m_part3 > lhs.m_part3) { return false; }
+			if (l.m_part3 < r.m_part3) { return true; }
+			else if (l.m_part3 > r.m_part3) { return false; }
 			else {
 
-				if (rhs.m_part4 < lhs.m_part4) { return true; }
-				else if (rhs.m_part4 > lhs.m_part4) { return false; }
+				if (l.m_part4 < r.m_part4) { return true; }
+				else if (l.m_part4 > r.m_part4) { return false; }
 				else {
 
-					if (rhs.m_port < lhs.m_port) { return true; }
+					if (l.m_port < r.m_port) { return true; }
 
 				}
 			}
@@ -96,9 +100,4 @@ bool ip::operator<(const ip::IpAddress& rhs, const ip::IpAddress& lhs) {
 	}
 
 	return false;
-}
-
-std::ostream& ip::operator<<(std::ostream& out, const ip::IpAddress& ip){
-	out << ip.str();
-	return out;
 }
