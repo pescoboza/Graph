@@ -1,5 +1,5 @@
 #ifndef NET_NODE_HPP
-
+#define NET_NODE_HPP
 
 #include "IpAddress.hpp"
 
@@ -13,7 +13,7 @@ public:
 	};
 
 protected:
-	// Private constructor for use by children classes only
+	// Protected constructor for use by children classes only
 	// Time coplexity: O(1)
 	// Space coplexity: O(1)
 	NetNode(Type nodeType, const ip::IpAddress& ip, unsigned numConnections = 0U) : m_nodeType{ nodeType }, m_ip{ip}, m_numConnections{ numConnections }{}

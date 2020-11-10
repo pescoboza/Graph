@@ -1,7 +1,7 @@
 #ifndef LISTENER_HPP
+#define LISTENER_HPP
 
 #include "NetNode.hpp"
-#include "IpAddress.hpp"
 
 class Listener : public NetNode {
 	

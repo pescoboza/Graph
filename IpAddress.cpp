@@ -1,5 +1,7 @@
 #include "IpAddress.hpp"
 
+#include <sstream>
+
 ip::IpAddress::IpAddress(unsigned part1, unsigned part2, unsigned part3, unsigned part4, unsigned port) :
 	m_part1{ part1 }, m_part2{ m_part2 }, m_part3{ m_part3 }, m_part4{ m_part4 }, m_port{ m_port }{}
 

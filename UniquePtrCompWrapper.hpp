@@ -1,4 +1,5 @@
 #ifndef UNIQUE_PTR_COMP_WRAPPER_HPP
+#define UNIQUE_PTR_COMP_WRAPPER_HPP
 
 #include <memory>
 
@@ -24,8 +25,8 @@ public:
 	const T& operator*() const { return *m_data; }
 	T& operator*() { return *m_data.get(); }
 	const T& operator->() const { return *m_data; }
-	T& operator->() { return *m_data.get() }
-	bool operator bool()const { return m_data == nullptr };
+	T& operator->() { return *m_data.get(); }
+	operator bool()const { return m_data == nullptr; }
 
 
 	friend bool operator==(const UniquePtrCompWrapper& l, const UniquePtrCompWrapper& r) {

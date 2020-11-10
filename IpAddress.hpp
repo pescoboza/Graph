@@ -1,8 +1,7 @@
 #ifndef IP_ADDRESS_HPP
 #define IP_ADDRESS_HPP
 
-#include <memory>
-#include <sstream>
+#include <iostream>
 #include <string>
 #include <vector>
 
