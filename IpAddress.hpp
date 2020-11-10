@@ -27,6 +27,7 @@ namespace ip {
 		friend bool operator==(const ip::IpAddress& rhs, const ip::IpAddress& lhs);
 		friend bool operator>(const ip::IpAddress& rhs, const ip::IpAddress& lhs);
 		friend bool operator<(const ip::IpAddress& rhs, const ip::IpAddress& lhs);
+		friend std::ostream& operator<<(std::ostream& out, const ip::IpAddress& ip);
 	};
 
 };

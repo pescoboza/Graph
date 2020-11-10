@@ -95,3 +95,8 @@ bool ip::operator<(const ip::IpAddress& rhs, const ip::IpAddress& lhs) {
 
 	return false;
 }
+
+std::ostream& ip::operator<<(std::ostream& out, const ip::IpAddress& ip){
+	out << ip.str();
+	return out;
+}

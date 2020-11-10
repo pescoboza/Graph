@@ -52,32 +52,51 @@ std::string parseIpStr(const std::string& line) {
 	return ipStr;
 }
 
+//
+//int main() {
+//	using NodeNetPtr = UniquePtrCompWrapper<NetNode>;
+//	using NetGraph = Graph<NodeNetPtr>;
+//
+//	NetGraph graph;
+//	
+//	{
+//		std::vector<std::string> lines;
+//
+//		{
+//
+//			// Read the file
+//			auto lines{ fio::readLines(FILENAME) };
+//
+//			// Enter the data from the file int othe tree
+//			for (const auto& line : lines) {
+//				
+//				NodeNetPtr 
+//
+//			}
+//		} // lines goes out of scope here
+//
+//	}
+//
+//
+//
+//	return 0;
+//}
+
 
 int main() {
-	using NodeNetPtr = UniquePtrCompWrapper<NetNode>;
-	using NetGraph = Graph<NodeNetPtr>;
-
-	NetGraph graph;
+	using PtrWrap = UniquePtrCompWrapper<ip::IpAddress>;
 	
-	{
-		std::vector<std::string> lines;
-
-		{
-
-			// Read the file
-			auto lines{ fio::readLines(FILENAME) };
-
-			// Enter the data from the file int othe tree
-			for (const auto& line : lines) {
-				
-				NodeNetPtr 
-
-			}
-		} // lines goes out of scope here
-
-	}
+	ip::IpAddress ip1{ 0,0,0,0,5000 };
+	ip::IpAddress ip2{0,0,0,0,5001};
 
 
+	PtrWrap ip1Ptr{ ip1 };
+	PtrWrap ip2Ptr{ip2};
 
-	return 0;
+	std::cout << *ip1Ptr << '\n';
+	std::cout << *ip2Ptr << '\n';
+	
+
+
 }
+
