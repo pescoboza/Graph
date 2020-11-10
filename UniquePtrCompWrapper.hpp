@@ -10,6 +10,8 @@ class UniquePtrCompWrapper {
 	std::unique_ptr<T> m_data;
 
 public:
+	UniquePtrCompWrapper() : m_data{ std::make_unique<T>() } {}
+
 	// Constructor overload for construction in-place
 	template <typename ...Args>
 	UniquePtrCompWrapper(Args&& ...args) : m_data{ std::make_unique<T>(args...) } {}

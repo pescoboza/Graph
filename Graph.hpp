@@ -24,6 +24,9 @@ public:
 	Graph();
 	Graph(const std::vector<std::pair<T, std::vector<T>>>& adjList);
 
+	const T& at(const T& node)const;
+	T& at(const T& node);
+
 	// Returns the number of nodes in the graph.
 	// Time complexity: O(1)
 	// Space complexity: O(1)
@@ -148,6 +151,17 @@ inline Graph<T>::Graph() : m_table{} {}
 template<typename T>
 inline Graph<T>::Graph(const std::vector<std::pair<T, std::vector<T>>>& adjList) : Graph{}  {
 	loadGraph(adjList);
+}
+
+template<typename T>
+inline const T& Graph<T>::at(const T& node) const{
+	return m_table.at(node);
+	
+}
+
+template<typename T>
+inline T& Graph<T>::at(const T& node){
+	return m_table.at(node);
 }
 
 template<typename T>

@@ -9,6 +9,7 @@
 #include "Client.hpp"
 #include "Listener.hpp"
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -52,56 +53,53 @@ std::string parseIpStr(const std::string& line) {
 	return ipStr;
 }
 
-//
-//int main() {
-//	using NodeNetPtr = UniquePtrCompWrapper<NetNode>;
-//	using NetGraph = Graph<NodeNetPtr>;
-//
-//	NetGraph graph;
-//	
-//	{
-//		std::vector<std::string> lines;
-//
-//		{
-//
-//			// Read the file
-//			auto lines{ fio::readLines(FILENAME) };
-//
-//			// Enter the data from the file int othe tree
-//			for (const auto& line : lines) {
-//				
-//				NodeNetPtr 
-//
-//			}
-//		} // lines goes out of scope here
-//
-//	}
-//
-//
-//
-//	return 0;
-//}
-
 
 int main() {
-	using PtrWrap = UniquePtrCompWrapper<ip::IpAddress>;
+	using NetNodeRef = std::reference_wrapper<NetNode>;
+	using NetGraph = Graph<NetNodeRef>;
+
+	std::vector<std::unique_ptr<NetNode>> data;
+	NetGraph graph;
 	
-	ip::IpAddress ip1{ 0,0,0,0,5000 };
-	ip::IpAddress ip2{0,0,0,0,5001};
+	{
+		std::vector<std::string> lines;
+
+		{
+
+			// Read the file
+			auto lines{ fio::readLines(FILENAME) };
+
+			// Enter the data from the file int othe tree
+			for (const auto& line : lines) {
+				
+				// Parse the ip line string into a string object
+				ip::IpAddress ip{parseIpStr(line)};
+				
+				// Add listener to data holder container with polymorphic pointers
+				data.emplace_back(std::make_unique<Listener>(ip.m_port));
+				NetNode& listener{ *data.back() };
+				
+				// Same for client
+				data.emplace_back(std::make_unique<Client>(ip.m_part1, ip.m_part2, ip.m_part3, ip.m_part4));
+				NetNode& client{*data.back()};
+
+				if (graph.find(client))
+					graph.at(client).get().incConnections();
+
+				if (graph.find(listener))
+					graph.at(client).get().incConnections();
+
+				// TODO: Finish here wit graph construction.
 
 
-	PtrWrap ip1Ptr{ ip1 };
-	PtrWrap ip2Ptr{ip2};
+			}
+		} // lines goes out of scope here
+
+	}
 
 
-	std::cout << *ip1Ptr << '\n';
-	std::cout << *ip2Ptr << '\n';
 
-	std::cout << std::boolalpha << (*ip1Ptr > * ip2Ptr) << '\n';
-
-	std::cout << ip2Ptr->str();
-	std::cout << std::boolalpha << !ip2Ptr << '\n';
-
-
+	return 0;
 }
+
 

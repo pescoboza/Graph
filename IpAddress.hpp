@@ -19,6 +19,7 @@ namespace ip {
 		unsigned m_part4;
 		unsigned m_port;
 
+		IpAddress();
 		IpAddress(unsigned part1, unsigned part2, unsigned part3, unsigned part4, unsigned port);
 		IpAddress(const std::string& ipStr);
 		std::string str() const;

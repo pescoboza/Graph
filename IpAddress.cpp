@@ -2,6 +2,13 @@
 
 #include <sstream>
 
+ip::IpAddress::IpAddress() :
+	m_part1{ 0U },
+	m_part2{ 0U },
+	m_part3{ 0U },
+	m_part4{ 0U },
+	m_port{ 0U }{}
+
 ip::IpAddress::IpAddress(unsigned part1, unsigned part2, unsigned part3, unsigned part4, unsigned port) :
 	m_part1{ part1 }, 
 	m_part2{ part2 }, 
