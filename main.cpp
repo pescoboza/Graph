@@ -100,7 +100,7 @@ int main() {
 	std::cout << std::boolalpha << (*ip1Ptr > * ip2Ptr) << '\n';
 
 	std::cout << ip2Ptr->str();
-	
+	std::cout << std::boolalpha << !ip2Ptr << '\n';
 
 
 }

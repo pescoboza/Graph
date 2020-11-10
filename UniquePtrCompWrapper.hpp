@@ -26,7 +26,7 @@ public:
 	T& operator*() { return *m_data.get(); }
 	const T* operator->() const { return m_data.get(); }
 	T* operator->() { return m_data.get(); }
-	operator bool()const { return m_data == nullptr; }
+	operator bool()const { return m_data.get() != nullptr; }
 
 
 	friend bool operator==(const UniquePtrCompWrapper& l, const UniquePtrCompWrapper& r) {
