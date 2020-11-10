@@ -48,128 +48,69 @@ void testBase(Container& adt, const K& key, std::ostream& out = std::cout) {
 }
 
 
-void test1() {
-	// Bipartite: true
-	// Tree:	  true
-	// DFS:       0 1 3 4 5 2
-	// BFS:       0 1 2 3 4 5 
-	// TopSort:   2 5 4 3 1 0
-
-	std::vector<std::pair<unsigned, std::vector<unsigned>>> adjList{
-		{0,{ 1, 2    }},
-		{1,{ 3, 4, 5 }},
-		{2,{         }},
-		{3,{         }},
-		{4,{         }},
-		{5,{         }}
-	};
-
-	GraphUint graph{ adjList };
-	auto root{ 0U };
-
-	testBase(graph, root);
-}
 
 
-void test2() {
-	// Bipartite: true
-	// Tree:	  false
-	// DFS:       0 1 3 4 5 2
-	// BFS:       0 1 2 3 4 5 
-	// TopSort:   2 5 4 3 1 0
-	
-	std::vector<std::pair<unsigned, std::vector<unsigned>>> adjList{
-		{0,{ 1, 2    }},
-		{1,{ 3, 4, 5 }},
-		{2,{         }},
-		{3,{         }},
-		{4,{         }},
-		{5,{ 0       }}
-	};
+// Pedro Escoboza
+// A01251531
+// 22/08/2020
+// TC1031.501
 
-	GraphUint graph{ adjList };
-	auto root{ 0U };
+#include <unordered_map>
 
-	testBase(graph, root);
-}
+#define BINARY_SEARCH_TREE_ACCEPT_REPEATED_KEYS 1
 
+#include "IpAddress.hpp"
+#include "fileio.hpp"
 
+constexpr const char* FILENAME{ "bitacora3.txt" };
+using Entry = std::pair<unsigned, ip::IpAddress>;
 
-void test3() {
-	Graph<std::string> graph;
-
-	std::string a{ "Ana" };
-	std::string b{ "Benito" };
-	std::string c{ "Carlos" };
-	std::string d{ "Dora" };
-	std::string e{ "Ernesto" };
-	std::string f{ "Francisco" };
+std::string parseIpStr(const std::string& line) {
+	// Get the file line into a stream to output tokens
+	std::istringstream fullLine{ line };
 
 	
-	std::vector<std::pair<std::string, std::vector<std::string>>> adjList{
-		{a,{ b, c }},
-		{b,{ f    }},
-		{c,{ f    }},
-		{d,{ c, e }},
-		{e,{ b    }},
-		{f,{ d    }}
-	};
+	// Throw away unsused information
+	{
+		std::string str;
+		fullLine >> str;
+		fullLine >> str;
+		fullLine >> str;
+	}
 
-	graph.loadGraph(adjList);
-	auto root{ d };
+	// Extract the ip string
+	std::string ipStr;
+	fullLine >> ipStr;
 
-	testBase(graph, root);
+	return ipStr;
 }
 
-void test4() {
 
-	std::vector<std::pair<unsigned, std::vector<unsigned>>> adjList{
-		{0,{    1, 2, 3, 4 }},
-		{1,{ 0,    2, 3, 4 }},
-		{2,{ 0, 1,    3, 4 }},
-		{3,{ 0, 1, 2,    4 }},
-		{4,{ 0, 1, 2, 3    }}
-	};
-	
-	GraphUint graph{ adjList };
-	auto root{ 0U };
-
-	testBase(graph, root);
-}
-
-void test5() {
-
-	std::vector<std::pair<char, std::vector<char>>> adjList{
-		{'a',{ 'b', 'c' }},
-		{'b',{ 'd' }},
-		{'c',{ 'c' }},
-		{'d',{ 'e', 'f' }},
-		{'e',{ 'f' }}
-	};
-
-	Graph<char> graph{ adjList };
-	auto root{ 'a' };
-
-	testBase(graph, root);
+Entry newEntry(unsigned numTimesAccessed, const ip::IpAddress& ip) {
+	return std::make_pair(numTimesAccessed, ip);
 }
 
 
 int main() {
-	std::cout << "======= Test 1 =======\n";
-	test1();
 
-	std::cout << "======= Test 2 =======\n";
-	test2();
-	
-	std::cout << "======= Test 3 =======\n";
-	test3();
-
-	std::cout << "======= Test 4 =======\n";
-	test4();
-
-	std::cout << "======= Test 5 =======\n";
-	test5();
 	
 
+	{
+		std::unordered_map<std::string, unsigned> ipMap;
+
+		{
+
+			// Read the file
+			auto lines{ fio::readLines(FILENAME) };
+
+			// Enter the data from the file int othe tree
+			for (const auto& line : lines) {
+
+				auto ipStr{ parseIpStr(line) };
+				
+			}
+		} // lines goes out of scope here
+
+		
 	return 0;
 }
