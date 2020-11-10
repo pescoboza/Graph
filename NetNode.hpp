@@ -6,7 +6,7 @@ class NetNode {
 public:
 	// Types of net nodes, each corresponding to a child class
 	enum class Type {
-		PORT,
+		LISTENER,
 		CLIENT
 	};
 
