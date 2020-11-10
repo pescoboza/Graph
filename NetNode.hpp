@@ -59,5 +59,4 @@ protected:
 
 };
 
-
 #endif // !NET_NODE_HPP
