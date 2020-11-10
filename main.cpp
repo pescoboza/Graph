@@ -93,8 +93,13 @@ int main() {
 	PtrWrap ip1Ptr{ ip1 };
 	PtrWrap ip2Ptr{ip2};
 
+
 	std::cout << *ip1Ptr << '\n';
 	std::cout << *ip2Ptr << '\n';
+
+	std::cout << std::boolalpha << (*ip1Ptr > * ip2Ptr) << '\n';
+
+	std::cout << ip2Ptr->str();
 	
 
 

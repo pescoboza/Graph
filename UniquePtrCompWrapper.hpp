@@ -24,8 +24,8 @@ public:
 
 	const T& operator*() const { return *m_data; }
 	T& operator*() { return *m_data.get(); }
-	const T& operator->() const { return *m_data; }
-	T& operator->() { return *m_data.get(); }
+	const T* operator->() const { return *m_data; }
+	T* operator->() { return *m_data.get(); }
 	operator bool()const { return m_data == nullptr; }
 
 
