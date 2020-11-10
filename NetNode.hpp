@@ -1,6 +1,8 @@
 #ifndef NET_NODE_HPP
 
 
+#include "IpAddress.hpp"
+
 // Interface for net nodes of different types: ports and clients
 class NetNode {
 public:
@@ -14,7 +16,7 @@ protected:
 	// Private constructor for use by children classes only
 	// Time coplexity: O(1)
 	// Space coplexity: O(1)
-	NetNode(Type nodeType, unsigned numConnections = 0U) : m_nodeType{ nodeType }, m_numConnections{ numConnections }{}
+	NetNode(Type nodeType, const ip::IpAddress& ip, unsigned numConnections = 0U) : m_nodeType{ nodeType }, m_ip{ip}, m_numConnections{ numConnections }{}
 
 public:
 
@@ -52,6 +54,8 @@ private:
 	Type m_nodeType;
 	unsigned m_numConnections;
 
+protected:
+	ip::IpAddress m_ip;
 
 };
 
