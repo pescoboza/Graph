@@ -10,6 +10,7 @@
 #include "Listener.hpp"
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -55,8 +56,7 @@ std::string parseIpStr(const std::string& line) {
 
 
 int main() {
-	using NetNodeRef = std::reference_wrapper<NetNode>;
-	using NetGraph = Graph<NetNodeRef>;
+	using NetGraph = Graph<NetNode*, NetNode::PolyPtrHash, NetNode::PolyPtrEqual>;
 
 	std::vector<std::unique_ptr<NetNode>> data;
 	NetGraph graph;
@@ -77,21 +77,23 @@ int main() {
 				
 				// Add listener to data holder container with polymorphic pointers
 				data.emplace_back(std::make_unique<Listener>(ip.m_port));
-				NetNode& listener{ *data.back() };
+				NetNode* listener{ data.back().get() };
 				
 				// Same for client
 				data.emplace_back(std::make_unique<Client>(ip.m_part1, ip.m_part2, ip.m_part3, ip.m_part4));
-				NetNode& client{*data.back()};
+				NetNode* client{data.back().get()};
 
-				if (graph.find(client))
-					graph.at(client).get().incConnections();
+				// Look for the nodes and get iterators
+				NetNode* const * clientIt{ graph.find(client) };
+				NetNode* const * listenerIt{ graph.find(listener) };
 
-				if (graph.find(listener))
-					graph.at(client).get().incConnections();
+				// Check for their validity and increment theier connection number
+				if (clientIt && *clientIt)
+					(*clientIt)->incConnections();
 
-				// TODO: Finish here wit graph construction.
-
-
+				if (listenerIt && *listenerIt)
+					(*listenerIt)->incConnections();
+					
 			}
 		} // lines goes out of scope here
 

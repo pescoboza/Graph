@@ -8,24 +8,30 @@
 #define GRAPH_HPP
 
 #include <iostream>
+#include <functional>
 #include <queue>
 #include <unordered_set>
 #include <unordered_map>
 #include <vector>
 
-template <typename T>
+template <
+	typename T, 
+	class Hash = std::hash<T>, 
+	class KeyEqual = std::equal_to<T>
+>
 class Graph{
 	using ChildPtrs = std::unordered_set<const T*>;
 
 protected:
-	std::unordered_map<T, ChildPtrs> m_table;
+	std::unordered_map<T, ChildPtrs, Hash, KeyEqual> m_table;
 
 public:
 	Graph();
 	Graph(const std::vector<std::pair<T, std::vector<T>>>& adjList);
 
-	const T& at(const T& node)const;
-	T& at(const T& node);
+	// Executes a callback for each node
+	template <class UnaryFunction>
+	void forEach(UnaryFunction func)const;
 
 	// Returns the number of nodes in the graph.
 	// Time complexity: O(1)
@@ -35,7 +41,7 @@ public:
 	// Returns if the node value is in the graph.
 	// Time complexity: O(1)
 	// Space complexity: O(1)
-	bool find(const T& value) const;
+	const T* find(const T& value) const;
 
 	// Loads graph from adjacency list, overwriting all previous data.
 	// Time complexity: O(n^2)
@@ -145,45 +151,36 @@ public:
 	void loadGraph(const std::vector<std::vector<bool>>& adjMat);
 };
 
-template<typename T>
-inline Graph<T>::Graph() : m_table{} {}
+template<typename T, class Hash, class KeyEqual>
+inline Graph<T, Hash, KeyEqual>::Graph() : m_table{} {}
 
-template<typename T>
-inline Graph<T>::Graph(const std::vector<std::pair<T, std::vector<T>>>& adjList) : Graph{}  {
+template<typename T, class Hash, class KeyEqual>
+inline Graph<T, Hash, KeyEqual>::Graph(const std::vector<std::pair<T, std::vector<T>>>& adjList) : Graph{}  {
 	loadGraph(adjList);
 }
 
-template<typename T>
-inline const T& Graph<T>::at(const T& node) const{
-	return m_table.at(node);
-	
-}
 
-template<typename T>
-inline T& Graph<T>::at(const T& node){
-	return m_table.at(node);
-}
-
-template<typename T>
-inline size_t Graph<T>::size() const{
+template<typename T, class Hash, class KeyEqual>
+inline size_t Graph<T, Hash, KeyEqual>::size() const{
 	return m_table.size();
 }
 
-template<typename T>
-inline bool Graph<T>::find(const T& value) const{
-	return m_table.find(value) != m_table.end();
+template<typename T, class Hash, class KeyEqual>
+inline  const T* Graph<T, Hash, KeyEqual>::find(const T& value) const{
+	auto it{ m_table.find(value) };
+	return  (it == m_table.end() ? nullptr : &it->first);
 }
 
-template<typename T>
-inline void Graph<T>::loadGraph(const std::vector<std::pair<T, std::vector<T>>>& adjList){
+template<typename T, class Hash, class KeyEqual>
+inline void Graph<T, Hash, KeyEqual>::loadGraph(const std::vector<std::pair<T, std::vector<T>>>& adjList){
 	m_table.clear();
 	std::vector<T> empty;
 	for (const auto& node : adjList)
 		addNodeRef(node.first, empty, node.second);
 }
 
-template<typename T>
-inline Graph<T>& Graph<T>::addNodeRef(const T& value, const std::vector<T>& parents, const std::vector<T>& children){
+template<typename T, class Hash, class KeyEqual>
+inline Graph<T, Hash, KeyEqual>& Graph<T, Hash, KeyEqual>::addNodeRef(const T& value, const std::vector<T>& parents, const std::vector<T>& children){
 	
 	// Do not insert islands
 	if (parents.empty() && children.empty())
@@ -218,18 +215,18 @@ inline Graph<T>& Graph<T>::addNodeRef(const T& value, const std::vector<T>& pare
 	return *this;
 }
 
-template<typename T>
-inline Graph<T>& Graph<T>::addNodeCpy(const T& value, std::vector<T> parents, std::vector<T> children){
+template<typename T, class Hash, class KeyEqual>
+inline Graph<T, Hash, KeyEqual>& Graph<T, Hash, KeyEqual>::addNodeCpy(const T& value, std::vector<T> parents, std::vector<T> children){
 	return addNodeRef(value, parents, children);
 }
 
-template<typename T>
-inline Graph<T>& Graph<T>::addEdge(const T& parent, const T& child) {
+template<typename T, class Hash, class KeyEqual>
+inline Graph<T, Hash, KeyEqual>& Graph<T, Hash, KeyEqual>::addEdge(const T& parent, const T& child) {
 	return addNodeCpy(parent, {}, {child});
 }
 
-template<typename T>
-inline void Graph<T>::printAdjList(std::ostream& out) const{
+template<typename T, class Hash, class KeyEqual>
+inline void Graph<T, Hash, KeyEqual>::printAdjList(std::ostream& out) const{
 	for (const auto& nodePair : m_table) {
 		out << nodePair.first << " { ";
 		for (const auto& childPtr : nodePair.second) {
@@ -239,27 +236,27 @@ inline void Graph<T>::printAdjList(std::ostream& out) const{
 	}
 }
 
-template<typename T>
-inline Graph<T>& Graph<T>::DFS(const T& head, const char* sep,  std::ostream& out){
+template<typename T, class Hash, class KeyEqual>
+inline Graph<T, Hash, KeyEqual>& Graph<T, Hash, KeyEqual>::DFS(const T& head, const char* sep,  std::ostream& out){
 	ChildPtrs visited;
 	dfs(head, [&sep, &out](const T& v) {out << v << sep; }, visited);
 	return *this;
 }
 
-template<typename T>
-inline Graph<T>& Graph<T>::BFS(const T& head, const char* sep, std::ostream& out){
+template<typename T, class Hash, class KeyEqual>
+inline Graph<T, Hash, KeyEqual>& Graph<T, Hash, KeyEqual>::BFS(const T& head, const char* sep, std::ostream& out){
 	bfs(head, [&sep, &out](const T& v) {out << v << sep; });
 	return *this;
 }
 
-template<typename T>
-inline bool Graph<T>::isTree(const T& head){
+template<typename T, class Hash, class KeyEqual>
+inline bool Graph<T, Hash, KeyEqual>::isTree(const T& head){
 	ChildPtrs visited;
 	return !hasCycle(head, visited);
 }
 
-template<typename T>
-inline std::vector<const T*>& Graph<T>::topologicalSort(const T& head, std::vector<const T*>& stack){
+template<typename T, class Hash, class KeyEqual>
+inline std::vector<const T*>& Graph<T, Hash, KeyEqual>::topologicalSort(const T& head, std::vector<const T*>& stack){
 	auto insertStack{
 		[&stack](const T& value) {
 			stack.push_back(&value);
@@ -270,22 +267,22 @@ inline std::vector<const T*>& Graph<T>::topologicalSort(const T& head, std::vect
 	return stack;
 }
 
-template<typename T>
-inline std::vector<const T*> Graph<T>::topologicalSort(const T& head){
+template<typename T, class Hash, class KeyEqual>
+inline std::vector<const T*> Graph<T, Hash, KeyEqual>::topologicalSort(const T& head){
 	std::vector<const T*> stack;
 	topologicalSort(head, stack);
 	return stack;
 }
 
-template<typename T>
-inline bool Graph<T>::isBipartiteGraph(const T& head){
+template<typename T, class Hash, class KeyEqual>
+inline bool Graph<T, Hash, KeyEqual>::isBipartiteGraph(const T& head){
 	ChildPtrs red;
 	ChildPtrs blue;
 	return isBiGraph(head, false, red, blue);
 }
 
-template<typename T>
-inline bool Graph<T>::hasCycle(const T& value, ChildPtrs& visited){
+template<typename T, class Hash, class KeyEqual>
+inline bool Graph<T, Hash, KeyEqual>::hasCycle(const T& value, ChildPtrs& visited){
 	
 	// Look for value in node in table and throw if not found
 	auto it{ m_table.find(value) };
@@ -310,8 +307,8 @@ inline bool Graph<T>::hasCycle(const T& value, ChildPtrs& visited){
 	return false;
 }
 
-template<typename T>
-inline bool Graph<T>::isBiGraph(const T& value, bool prevWasRed, ChildPtrs& red, ChildPtrs& blue){
+template<typename T, class Hash, class KeyEqual>
+inline bool Graph<T, Hash, KeyEqual>::isBiGraph(const T& value, bool prevWasRed, ChildPtrs& red, ChildPtrs& blue){
 	
 	// Look for the value in graph, throw if not found
 	auto it{ m_table.find(value) };
@@ -356,24 +353,33 @@ inline bool Graph<T>::isBiGraph(const T& value, bool prevWasRed, ChildPtrs& red,
 }
 
 
-template<typename T>
+template<typename T, class Hash, class KeyEqual>
 template<class UnaryFunction>
-inline Graph<T>& Graph<T>::breathFirstSearch(const T& head, UnaryFunction visit){
+inline void Graph<T, Hash, KeyEqual>::forEach(UnaryFunction func) const{
+	for (const auto& p : m_table) {
+		const auto& const_ref{p.first};
+		func(const_ref);
+	}
+}
+
+template<typename T, class Hash, class KeyEqual>
+template<class UnaryFunction>
+inline Graph<T, Hash, KeyEqual>& Graph<T, Hash, KeyEqual>::breathFirstSearch(const T& head, UnaryFunction visit){
 	bfs(head, visit);
 	return *this;
 }
 
-template<typename T>
+template<typename T, class Hash, class KeyEqual>
 template<class UnaryFunction>
-inline Graph<T>& Graph<T>::depthFirstSearch(const T& head, UnaryFunction visit){
+inline Graph<T, Hash, KeyEqual>& Graph<T, Hash, KeyEqual>::depthFirstSearch(const T& head, UnaryFunction visit){
 	ChildPtrs visited;
 	dfs(head, visit, visited);
 	return *this;
 }
 
-template<typename T>
+template<typename T, class Hash, class KeyEqual>
 template<class UnaryFunction>
-inline void Graph<T>::bfs(const T& value, UnaryFunction visit){
+inline void Graph<T, Hash, KeyEqual>::bfs(const T& value, UnaryFunction visit){
 	
 	// Look for element in node table
 	auto it{m_table.find(value)};
@@ -408,9 +414,9 @@ inline void Graph<T>::bfs(const T& value, UnaryFunction visit){
 	
 }
 
-template<typename T>
+template<typename T, class Hash, class KeyEqual>
 template<class UnaryFunction>
-inline void Graph<T>::dfs(const T& value, UnaryFunction visit, ChildPtrs& visited){
+inline void Graph<T, Hash, KeyEqual>::dfs(const T& value, UnaryFunction visit, ChildPtrs& visited){
 	// Look for value in node list
 	auto it{m_table.find(value)};
 	if (it == m_table.end())
