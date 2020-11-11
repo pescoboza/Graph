@@ -75,6 +75,9 @@ public:
 		return m_numConnections;
 	}
 
+	// Getter for the node's ip
+	const ip::IpAddress& getIp() const { return m_ip; }
+
 	// Equality overloading for solving dynamic casting at runtime
 	// Time complexity: O(1) (Might vary depending on polymorphic type)
 	// Space complexity: O(1) (Might vary depending on polymorphic type)

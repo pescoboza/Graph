@@ -87,19 +87,44 @@ int main() {
 				NetNode* const * clientIt{ graph.find(client) };
 				NetNode* const * listenerIt{ graph.find(listener) };
 
-				// Check for their validity and increment theier connection number
-				if (clientIt && *clientIt)
-					(*clientIt)->incConnections();
+				// Set which nodes will get an attempta te getting inserted:
+				// The ones already found in, or the new ones
+				// (remember the date is owned by another container)
+				NetNode* tryInsertClient{ clientIt && *clientIt ? *clientIt : client};
+				NetNode* tryInsertListener{ listenerIt && *listenerIt ? *listenerIt : listener };
 
-				if (listenerIt && *listenerIt)
-					(*listenerIt)->incConnections();
-					
-			}
+				// Increment the connection number of those nodes
+				tryInsertClient->incConnections();
+				tryInsertListener->incConnections();
+
+				// Add the edge. Repetitions are discarded and only new nodes are inserted
+				// The graph class is unaware of num connections, so we did it manually
+				graph.addEdge(tryInsertClient, tryInsertListener);
+				
 		} // lines goes out of scope here
 
 	}
 
+	// Iterate through all nodes and determine which one has the highest connection count
+	unsigned numClientConnections{ 0U };
+	const NetNode* botMaster{ nullptr };
+	auto accumulateClientConnections{ 
+		[&numClientConnections, &botMaster] (const NetNode* node) {
+			if (!node) {
+				std::cerr << "Invalid node!" << std::endl ;
+				return;
+			}
 
+			if (node->getNodeType() == NetNode::Type::CLIENT && node->getNumConnections() > numClientConnections) {
+				numClientConnections = node->getNumConnections();
+				botMaster = node;
+			}
+		} 
+	};
+
+	graph.forEach(accumulateClientConnections);
+
+	std::cout << "Bot master: " << botMaster->getIp() << "\nNumber of connections: " << numClientConnections << '\n';
 
 	return 0;
 }
