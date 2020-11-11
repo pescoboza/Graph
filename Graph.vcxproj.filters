@@ -33,9 +33,6 @@
     <ClInclude Include="Client.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="UniquePtrCompWrapper.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

@@ -62,48 +62,46 @@ int main() {
 	NetGraph graph;
 	
 	{
-		std::vector<std::string> lines;
+		// Read the file
+		std::vector<std::string> lines{ fio::readLines(FILENAME) };
 
-		{
+		// Enter the data from the file int othe tree
+		for (const auto& line : lines) {
 
-			// Read the file
-			auto lines{ fio::readLines(FILENAME) };
+			// Parse the ip line string into a string object
+			ip::IpAddress ip{ parseIpStr(line) };
 
-			// Enter the data from the file int othe tree
-			for (const auto& line : lines) {
-				
-				// Parse the ip line string into a string object
-				ip::IpAddress ip{parseIpStr(line)};
-				
-				// Add listener to data holder container with polymorphic pointers
-				data.emplace_back(std::make_unique<Listener>(ip.m_port));
-				NetNode* listener{ data.back().get() };
-				
-				// Same for client
-				data.emplace_back(std::make_unique<Client>(ip.m_part1, ip.m_part2, ip.m_part3, ip.m_part4));
-				NetNode* client{data.back().get()};
+			// Add listener to data holder container with polymorphic pointers
+			data.emplace_back(std::make_unique<Listener>(ip.m_port));
+			NetNode* listener{ data.back().get() };
 
-				// Look for the nodes and get iterators
-				NetNode* const * clientIt{ graph.find(client) };
-				NetNode* const * listenerIt{ graph.find(listener) };
+			// Same for client
+			data.emplace_back(std::make_unique<Client>(ip.m_part1, ip.m_part2, ip.m_part3, ip.m_part4));
+			NetNode* client{ data.back().get() };
 
-				// Set which nodes will get an attempta te getting inserted:
-				// The ones already found in, or the new ones
-				// (remember the date is owned by another container)
-				NetNode* tryInsertClient{ clientIt && *clientIt ? *clientIt : client};
-				NetNode* tryInsertListener{ listenerIt && *listenerIt ? *listenerIt : listener };
+			// Look for the nodes and get iterators
+			NetNode* const* clientIt{ graph.find(client) };
+			NetNode* const* listenerIt{ graph.find(listener) };
 
-				// Increment the connection number of those nodes
-				tryInsertClient->incConnections();
-				tryInsertListener->incConnections();
+			// Set which nodes will get an attempta te getting inserted:
+			// The ones already found in, or the new ones
+			// (remember the date is owned by another container)
+			NetNode* tryInsertClient{ (clientIt && *clientIt) ? *clientIt : client };
+			NetNode* tryInsertListener{ (listenerIt && *listenerIt) ? *listenerIt : listener };
 
-				// Add the edge. Repetitions are discarded and only new nodes are inserted
-				// The graph class is unaware of num connections, so we did it manually
-				graph.addEdge(tryInsertClient, tryInsertListener);
-				
-		} // lines goes out of scope here
+			// Increment the connection number of those nodes
+			tryInsertClient->incConnections();
+			tryInsertListener->incConnections();
 
-	}
+			// Add the edge. Repetitions are discarded and only new nodes are inserted
+			// The graph class is unaware of num connections, so we did it manually
+			graph.addEdge(tryInsertClient, tryInsertListener);
+			
+		} // end for 
+		
+		
+
+	} // lines goes out of scope here
 
 	// Iterate through all nodes and determine which one has the highest connection count
 	unsigned numClientConnections{ 0U };
@@ -122,8 +120,10 @@ int main() {
 		} 
 	};
 
+	// Execute accumulation
 	graph.forEach(accumulateClientConnections);
 
+	// Display result
 	std::cout << "Bot master: " << botMaster->getIp() << "\nNumber of connections: " << numClientConnections << '\n';
 
 	return 0;
