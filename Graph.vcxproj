@@ -145,6 +145,7 @@
     <ClInclude Include="IpAddress.hpp" />
     <ClInclude Include="NetNode.hpp" />
     <ClInclude Include="Listener.hpp" />
+    <ClInclude Include="Timer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fileio.cpp" />

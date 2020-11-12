@@ -3,6 +3,7 @@
 // 05/11/2020
 // TC1031.501
 
+#include "Timer.hpp"
 #include "fileio.hpp"
 #include "UniquePtrCompWrapper.hpp"
 #include "Graph.hpp"
@@ -33,7 +34,7 @@ void printReversePtrs(const T& container, const char* sep = " ", std::ostream& o
 
 
 
-
+// Helper to parse the ip from the file line
 std::string parseIpStr(const std::string& line) {
 	// Get the file line into a stream to output tokens
 	std::istringstream fullLine{ line };
@@ -57,6 +58,8 @@ std::string parseIpStr(const std::string& line) {
 
 int main() {
 	using NetGraph = Graph<NetNode*, NetNode::PolyPtrHash, NetNode::PolyPtrEqual>;
+	
+	Timer timer;
 
 	std::vector<std::unique_ptr<NetNode>> data;
 	NetGraph graph;
@@ -125,7 +128,8 @@ int main() {
 
 	// Display result
 	std::cout << "Bot master: " << botMaster->getIp() << "\nNumber of connections: " << numClientConnections << '\n';
-
+	std::cout << "Elapsed: " << timer.elapsed() << "s. Press Enter to exit\n";
+	std::cin.get();
 	return 0;
 }
 
