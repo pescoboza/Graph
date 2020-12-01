@@ -3,10 +3,21 @@
 // 05/11/2020
 // TC1031.501
 
+#include "Timer.hpp"
+#include "fileio.hpp"
+#include "UniquePtrCompWrapper.hpp"
 #include "Graph.hpp"
+#include "Client.hpp"
+#include "Listener.hpp"
 
+#include <functional>
+#include <memory>
 #include <string>
 #include <vector>
+
+
+constexpr const char* FILENAME{ "bitacora3.txt" };
+
 
 // Helper to print container in reverse that supports random access iterators.
 template <class T>
@@ -21,155 +32,105 @@ void printReversePtrs(const T& container, const char* sep = " ", std::ostream& o
 		out << **it << sep;
 }
 
-// Helper to run test cases and print to given ostream.
-template <class Container, typename K>
-void testBase(Container& adt, const K& key, std::ostream& out = std::cout) {
-
-	out << "Adjacency List:\n";
-	adt.printAdjList();
-	out << '\n';
 
 
-	out << "Tree: " << std::boolalpha << adt.isTree(key) << '\n';
-	out << "Bipartite Graph: " << std::boolalpha << adt.isBipartiteGraph(key) << '\n';
-
-	out << "DFS: ";
-	adt.DFS(key);
-	out << '\n';
-
-	out << "BFS: ";
-	adt.BFS(key);
-	out << '\n';
-
-	out << "Topological Sort: ";
-	printReversePtrs(adt.topologicalSort(key));
-
-	out << "\n\n";
-}
-
-
-void test1() {
-	// Bipartite: true
-	// Tree:	  true
-	// DFS:       0 1 3 4 5 2
-	// BFS:       0 1 2 3 4 5 
-	// TopSort:   2 5 4 3 1 0
-
-	std::vector<std::pair<unsigned, std::vector<unsigned>>> adjList{
-		{0,{ 1, 2    }},
-		{1,{ 3, 4, 5 }},
-		{2,{         }},
-		{3,{         }},
-		{4,{         }},
-		{5,{         }}
-	};
-
-	GraphUint graph{ adjList };
-	auto root{ 0U };
-
-	testBase(graph, root);
-}
-
-
-void test2() {
-	// Bipartite: true
-	// Tree:	  false
-	// DFS:       0 1 3 4 5 2
-	// BFS:       0 1 2 3 4 5 
-	// TopSort:   2 5 4 3 1 0
-	
-	std::vector<std::pair<unsigned, std::vector<unsigned>>> adjList{
-		{0,{ 1, 2    }},
-		{1,{ 3, 4, 5 }},
-		{2,{         }},
-		{3,{         }},
-		{4,{         }},
-		{5,{ 0       }}
-	};
-
-	GraphUint graph{ adjList };
-	auto root{ 0U };
-
-	testBase(graph, root);
-}
-
-
-
-void test3() {
-	Graph<std::string> graph;
-
-	std::string a{ "Ana" };
-	std::string b{ "Benito" };
-	std::string c{ "Carlos" };
-	std::string d{ "Dora" };
-	std::string e{ "Ernesto" };
-	std::string f{ "Francisco" };
+// Helper to parse the ip from the file line
+std::string parseIpStr(const std::string& line) {
+	// Get the file line into a stream to output tokens
+	std::istringstream fullLine{ line };
 
 	
-	std::vector<std::pair<std::string, std::vector<std::string>>> adjList{
-		{a,{ b, c }},
-		{b,{ f    }},
-		{c,{ f    }},
-		{d,{ c, e }},
-		{e,{ b    }},
-		{f,{ d    }}
-	};
+	// Throw away unsused information
+	{
+		std::string str;
+		fullLine >> str;
+		fullLine >> str;
+		fullLine >> str;
+	}
 
-	graph.loadGraph(adjList);
-	auto root{ d };
+	// Extract the ip string
+	std::string ipStr;
+	fullLine >> ipStr;
 
-	testBase(graph, root);
-}
-
-void test4() {
-
-	std::vector<std::pair<unsigned, std::vector<unsigned>>> adjList{
-		{0,{    1, 2, 3, 4 }},
-		{1,{ 0,    2, 3, 4 }},
-		{2,{ 0, 1,    3, 4 }},
-		{3,{ 0, 1, 2,    4 }},
-		{4,{ 0, 1, 2, 3    }}
-	};
-	
-	GraphUint graph{ adjList };
-	auto root{ 0U };
-
-	testBase(graph, root);
-}
-
-void test5() {
-
-	std::vector<std::pair<char, std::vector<char>>> adjList{
-		{'a',{ 'b', 'c' }},
-		{'b',{ 'd' }},
-		{'c',{ 'c' }},
-		{'d',{ 'e', 'f' }},
-		{'e',{ 'f' }}
-	};
-
-	Graph<char> graph{ adjList };
-	auto root{ 'a' };
-
-	testBase(graph, root);
+	return ipStr;
 }
 
 
 int main() {
-	std::cout << "======= Test 1 =======\n";
-	test1();
-
-	std::cout << "======= Test 2 =======\n";
-	test2();
+	using NetGraph = Graph<NetNode*, NetNode::PolyPtrHash, NetNode::PolyPtrEqual>;
 	
-	std::cout << "======= Test 3 =======\n";
-	test3();
+	Timer timer;
 
-	std::cout << "======= Test 4 =======\n";
-	test4();
-
-	std::cout << "======= Test 5 =======\n";
-	test5();
+	std::vector<std::unique_ptr<NetNode>> data;
+	NetGraph graph;
 	
+	{
+		// Read the file
+		std::vector<std::string> lines{ fio::readLines(FILENAME) };
 
+		// Enter the data from the file int othe tree
+		for (const auto& line : lines) {
+
+			// Parse the ip line string into a string object
+			ip::IpAddress ip{ parseIpStr(line) };
+
+			// Add listener to data holder container with polymorphic pointers
+			data.emplace_back(std::make_unique<Listener>(ip.m_port));
+			NetNode* listener{ data.back().get() };
+
+			// Same for client
+			data.emplace_back(std::make_unique<Client>(ip.m_part1, ip.m_part2, ip.m_part3, ip.m_part4));
+			NetNode* client{ data.back().get() };
+
+			// Look for the nodes and get iterators
+			NetNode* const* clientIt{ graph.find(client) };
+			NetNode* const* listenerIt{ graph.find(listener) };
+
+			// Set which nodes will get an attempta te getting inserted:
+			// The ones already found in, or the new ones
+			// (remember the date is owned by another container)
+			NetNode* tryInsertClient{ (clientIt && *clientIt) ? *clientIt : client };
+			NetNode* tryInsertListener{ (listenerIt && *listenerIt) ? *listenerIt : listener };
+
+			// Increment the connection number of those nodes
+			tryInsertClient->incConnections();
+			tryInsertListener->incConnections();
+
+			// Add the edge. Repetitions are discarded and only new nodes are inserted
+			// The graph class is unaware of num connections, so we did it manually
+			graph.addEdge(tryInsertClient, tryInsertListener);
+			
+		} // end for 
+		
+		
+
+	} // lines goes out of scope here
+
+	// Iterate through all nodes and determine which one has the highest connection count
+	unsigned numClientConnections{ 0U };
+	const NetNode* botMaster{ nullptr };
+	auto accumulateClientConnections{ 
+		[&numClientConnections, &botMaster] (const NetNode* node) {
+			if (!node) {
+				std::cerr << "Invalid node!" << std::endl ;
+				return;
+			}
+
+			if (node->getNodeType() == NetNode::Type::CLIENT && node->getNumConnections() > numClientConnections) {
+				numClientConnections = node->getNumConnections();
+				botMaster = node;
+			}
+		} 
+	};
+
+	// Execute accumulation
+	graph.forEach(accumulateClientConnections);
+
+	// Display result
+	std::cout << "Bot master: " << botMaster->getIp() << "\nNumber of connections: " << numClientConnections << '\n';
+	std::cout << "Elapsed: " << timer.elapsed() << "s. Press Enter to exit\n";
+	std::cin.get();
 	return 0;
 }
+
+

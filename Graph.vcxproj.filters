@@ -18,12 +18,36 @@
     <ClInclude Include="Graph.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="fileio.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IpAddress.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetNode.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Listener.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Graph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fileio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IpAddress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
